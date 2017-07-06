@@ -78,7 +78,7 @@ def downloadVideos(newVideos):
 
 
         # Save video in database after downloading
-        conn = sqlite3.connect(path+'videos.db')
+        conn = sqlite3.connect('echodownloader.db')
         c = conn.cursor()
 
         c.execute("INSERT INTO urls VALUES (?,?,?)", item)
@@ -90,12 +90,12 @@ def downloadVideos(newVideos):
 def checkDatabase(videos):
     newVideos = []
 
-    if not os.path.exists('videos.db'):
-        conn = sqlite3.connect('videos.db')
+    if not os.path.exists('echodownloader.db'):
+        conn = sqlite3.connect('echodownloader.db')
         c = conn.cursor()
         c.execute('CREATE TABLE "urls" ( `URL` TEXT, `Subject Code` TEXT, `Title` TEXT )')
 
-    conn = sqlite3.connect('videos.db')
+    conn = sqlite3.connect('echodownloader.db')
     c = conn.cursor()
 
     for item in videos:
