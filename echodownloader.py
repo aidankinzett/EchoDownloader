@@ -18,7 +18,7 @@ debug = False
 
 ## Returns the URLS of all videos for subjects in a list in format [[url,subject code, video title],...]
 def getVideoURLs():
-    print "Checking RSS feeds for videos..."
+    print("Checking RSS feeds for videos...")
 
     videos = []
 
@@ -39,7 +39,7 @@ def getVideoURLs():
             videos.append([url,code,title])
 
     if debug:
-        print "Found {0} videos".format(len(videos))
+        print("Found {0} videos".format(len(videos)))
 
     return videos
 
