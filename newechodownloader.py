@@ -1,4 +1,6 @@
 """
+Download videos from Echo360 recordings.
+
 Functions to:
     - Import config from YAML
     - Check RSS feeds
@@ -10,6 +12,8 @@ Todo:
     * Above stuff
     * Change check_database to check for wether or not the video has been downloaded,
       and does sqlite support bools?
+    * Add error handling
+    * More comments
 """
 import os
 import re
@@ -27,13 +31,14 @@ HIGH_QUALITY = CONFIG['high quality']
 
 
 def get_video_info(rss_feed):
-    """Returns info for all videos found in the given RSS feed
+    """Return info for all videos found in the given RSS feed.
 
     Args:
         rss_feed (str): The rss feed to check for videos
 
     Returns:
         list: List of found videos in format [[url,subject code, video title],...]
+
     """
     videos = []
 
@@ -55,21 +60,24 @@ def get_video_info(rss_feed):
     return videos
 
 def check_database(videos):
-    """Compares list of given videos to list of videos in database. If database
-    does not exist in the specified file directory, it is created.
+    """Compare a list of given videos to list of videos in database.
+
+    If database does not exist in the specified file directory, it is created.
 
     Args:
         videos (list): List of videos in format [[url,subject code, video title],...]
 
     Returns:
         list: List of videos not currently found in the database
+
     """
     new_videos = []
 
     if not os.path.exists(DB_PATH):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-        cursor.execute('CREATE TABLE "urls" ( `URL` TEXT, `Subject Code` TEXT, `Title` TEXT , `Downloaded` TEXT)')
+        cursor.execute('CREATE TABLE "urls" ( `URL` TEXT, `Subject Code` TEXT,'+
+                       '`Title` TEXT , `Downloaded` TEXT)')
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
