@@ -1,6 +1,6 @@
+from urllib.request import urlopen, URLopener
 import feedparser
 import re
-import urllib
 import sqlite3
 import sys
 import os
@@ -69,7 +69,7 @@ def downloadVideos(newVideos):
         if not os.path.exists(path+item[1]+'/Lecture Videos'): # checks to see if lecture videos folder exists, if not create it
             os.makedirs(path+item[1]+'/Lecture Videos')
 
-        videofile = urllib.URLopener()
+        videofile = URLopener()
         videofile.retrieve(item[0],path + item[1] + '/Lecture Videos/' + item[2] +'.mp4', reporthook=dlProgress)
 
         videosDone += 1
