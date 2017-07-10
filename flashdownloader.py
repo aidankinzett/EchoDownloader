@@ -33,15 +33,15 @@ def get_guid(xmldoc):
     # dos.makedirs(guid)
     return guid
 
-def download_video_file(time, url, guid):
+def download_swf_video_file(time, url, guid):
     """downloads a single video file from the filename"""
     URLopener().retrieve(url+"/slides/"+'{0:08d}'.format(time)+".swf", guid+"/"
                          +'{0:08d}'.format(time)+".swf")
 
-def download_all_videos(max_time, url, guid):
+def download_all_swf_videos(max_time, url, guid):
     """downloads all the videos from time 0 to time max_time"""
     for time in range(0, max_time+1, 8000):
-        download_video_file(time, url, guid)
+        download_swf_video_file(time, url, guid)
 
 def download_audio_file(url, guid):
     """downloads the audio file for the lecture"""
@@ -66,8 +66,8 @@ def concat_videos(max_time, guid):
 
     # run FFmpeg
     ff = ffmpy.FFmpeg(
-        inputs = input_dict,
-        outputs = {guid+"/video_output.mkv": '-filter_complex "concat=n={}:v=1 [v] " -map [v]'.format(len(input_dict))}
+        inputs=input_dict,
+        outputs={guid+"/video_output.mkv": '-filter_complex "concat=n={}:v=1 [v] " -map [v]'.format(len(input_dict))}
     )
     ff.run()
 
@@ -77,8 +77,8 @@ def concat_videos(max_time, guid):
 def trim_audio_file(guid):
     """trims the audio file to remove the qut intro sound"""
     ff = ffmpy.FFmpeg(
-        inputs = {guid+"/audio.mp3":None},
-        outputs = {guid+"/trimmed_audio.mp3":"-ss 00:00:14 -acodec copy"}
+        inputs={guid+"/audio.mp3":None},
+        outputs={guid+"/trimmed_audio.mp3":"-ss 00:00:14 -acodec copy"}
     )
     ff.run()
     os.remove(guid+"/audio.mp3")
@@ -86,8 +86,8 @@ def trim_audio_file(guid):
 def combine_audio_and_video(guid):
     """combines the trimmed audio and the concatonated video files"""
     ff = ffmpy.FFmpeg(
-        inputs = {guid+"/video_output.mkv": None, guid+"/trimmed_audio.mp3": None},
-        outputs = {guid+"/final_video.mkv": "-codec copy -shortest"}
+        inputs={guid+"/video_output.mkv": None, guid+"/trimmed_audio.mp3": None},
+        outputs={guid+"/final_video.mkv": "-codec copy -shortest"}
     )
     ff.run()
 
@@ -96,7 +96,7 @@ def high_quality_download(url):
     xmldoc = get_XML(newurl)
     max_time = 736000
     guid = get_guid(xmldoc)
-    download_all_videos(max_time, newurl, guid)
+    download_all_swf_videos(max_time, newurl, guid)
     download_audio_file(newurl, guid)
     convert_videos(max_time, guid)
     concat_videos(max_time, guid)
