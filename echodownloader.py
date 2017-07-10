@@ -1,5 +1,4 @@
-"""
-Download videos from Echo360 recordings.
+"""Download videos from Echo360 recordings.
 
 Functions to:
     - Import config from YAML
@@ -21,8 +20,7 @@ import sys
 from urllib.request import URLopener
 import yaml
 import feedparser
-
-
+import flashdownloader
 
 # open the configuration file and save config as constants
 with open("config.yml", 'r') as ymlfile:
@@ -131,7 +129,7 @@ def download_progress_bar(count, block_size, total_size):
 
     sys.stdout.flush()
 
-def download_video_file(video_info):
+def download_video_file(video_info, video_path):
     """Download video file.
 
     Args:
@@ -142,7 +140,41 @@ def download_video_file(video_info):
     # log the video to be downloaded
     print("Downloading {} from subejct {}".format(video_info[2], video_info[1]))
 
-    video_path = DOWNLOAD_DIRECTORY + '/' + video_info[2] + '.mp4'
+
+    # download video
+    URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
+    print("Finished downloading")
+
+def mark_db_downloaded(video_info):
+    # update video in database after downloading
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE urls SET `Downloaded` = 1 WHERE `URL` = ?", [video_info[0]])
+
+    # close connection to database
+    conn.commit()
+    conn.close()
+
+def download_all_videos(videos):
+    """Download all the videos provided using the download_video_file function.
+
+    Args:
+        new_videos (list): List of videos to download
+    """
+    if HIGH_QUALITY:
+        for video_info in videos:
+            video_path = get_video_path(video_info, '.mkv')
+            flashdownloader.high_quality_download(video_info[0], video_path)
+            mark_db_downloaded(video_info)
+    else:
+        for video_info in videos:
+            video_path = get_video_path(video_info, '.mp4')
+            download_video_file(video_info, video_path)
+            mark_db_downloaded(video_info)
+
+def get_video_path(video_info, extension):
+    video_path = DOWNLOAD_DIRECTORY + '/' + video_info[2] + extension
 
     # if video files are to be sorted into folders
     if SORT:
@@ -153,34 +185,16 @@ def download_video_file(video_info):
 
         # if to be placed within another folder
         if VIDEO_FOLDER_NAME:
-            video_path = DOWNLOAD_DIRECTORY + '/' + video_info[1] + '/' + VIDEO_FOLDER_NAME + '/' + video_info[2] + '.mp4'
+            video_path = DOWNLOAD_DIRECTORY + '/' + video_info[1] + '/' + VIDEO_FOLDER_NAME + '/' + video_info[2] + extension
 
             # if folder does not exist, create it
             if not os.path.exists(DOWNLOAD_DIRECTORY+'/'+video_info[1]+'/'+VIDEO_FOLDER_NAME):
                 os.makedirs(DOWNLOAD_DIRECTORY+'/'+video_info[1]+'/'+VIDEO_FOLDER_NAME)
 
         else:
-            video_path = DOWNLOAD_DIRECTORY + '/' + video_info[1] + '/' + video_info[2] + '.mp4'
+            video_path = DOWNLOAD_DIRECTORY + '/' + video_info[1] + '/' + video_info[2] + extension
 
-    # download video
-    URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
-    print("Finished downloading")
+    return video_path
 
-    # update video in database after downloading
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-
-    cursor.execute("UPDATE urls SET `Downloaded` = 1 WHERE `URL` = ?", [video_info[0]])
-
-def download_all_videos(videos):
-    """Download all the videos provided using the download_video_file function.
-
-    Args:
-        new_videos (list): List of videos to download
-    """
-    for video in videos:
-        download_video_file(video)
-
-check_database_exists()
-for feed in RSS_FEEDS:
-    download_all_videos(check_database(get_video_info(feed)))
+test_videos = get_video_info(RSS_FEEDS[0])
+download_all_videos([test_videos[2]])
