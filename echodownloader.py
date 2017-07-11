@@ -140,13 +140,19 @@ def download_video_file(video_info, video_path):
     # log the video to be downloaded
     print("Downloading {} from subejct {}".format(video_info[2], video_info[1]))
 
-
     # download video
     URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
     print("Finished downloading")
 
 def mark_db_downloaded(video_info):
-    # update video in database after downloading
+    """Update video in database after downloading.
+
+    Uses database specified in configuration file.
+
+    Args:
+        - video_info (list): Specifies the video to mark as downloaded, in format
+                             [url,subject code, video title]
+    """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
@@ -174,6 +180,20 @@ def download_all_videos(videos):
             mark_db_downloaded(video_info)
 
 def get_video_path(video_info, extension):
+    """Work out the path that the video needs to be saved to.
+
+    The path that the video needs to be saved to depends on a number of
+    options in the configuration file, this function calculates the path.
+
+    Args:
+        - video_info (list): Specifies the video to get the path for, in format
+                             [url,subject code, video title]
+        - extension (str): The file extension to be used for the final video
+
+    Returns:
+        - str: The path for the video to be saved to
+
+    """
     video_path = DOWNLOAD_DIRECTORY + '/' + video_info[2] + extension
 
     # if video files are to be sorted into folders
