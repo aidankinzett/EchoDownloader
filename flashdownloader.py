@@ -11,6 +11,13 @@ from urllib.request import urlopen, URLopener
 from xml.dom import minidom
 import os
 import ffmpy
+import yaml
+
+# open the configuration file and save config as constants
+with open("config.yml", 'r') as ymlfile:
+    CONFIG = yaml.load(ymlfile)
+
+DOWNLOAD_DIRECTORY = CONFIG['download directory']
 
 def get_swf_url(rssurl):
     """Get url for files from the url that is given by the rss feed.
@@ -87,8 +94,9 @@ def download_swf_video_file(time, url, guid):
         - guid (str): The lecture's guid
 
     """
-    URLopener().retrieve(url+"/slides/"+'{0:08d}'.format(time)+".swf", guid+"/"
-                         +'{0:08d}'.format(time)+".swf")
+    URLopener().retrieve(url+"/slides/"+'{0:08d}'.format(time)+".swf", DOWNLOAD_DIRECTORY
+                         + "/" + guid +"/" + '{0:08d}'.format(time)+".swf")
+
 
 def download_all_swf_videos(max_time, url, guid):
     """Download all the videos from time 0 to time max_time.
@@ -114,7 +122,7 @@ def download_audio_file(url, guid):
         - guid (str): The lecture's guid
 
     """
-    URLopener().retrieve(url+"/audio.mp3", guid+"/audio.mp3")
+    URLopener().retrieve(url+"/audio.mp3", DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3")
 
 def convert_videos(max_time, guid):
     """Convert all the swf files to mkv files.
@@ -128,11 +136,11 @@ def convert_videos(max_time, guid):
     """
     for time in range(0, max_time+1, 8000):
         ff_command = ffmpy.FFmpeg(
-            inputs={guid+"/"+'{0:08d}'.format(time)+'.swf': None},
-            outputs={guid+"/"+'{0:08d}'.format(time)+".mkv": None}
+            inputs={DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+'.swf': None},
+            outputs={DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+".mkv": None}
             )
         ff_command.run()
-        os.remove(guid+"/"+'{0:08d}'.format(time)+'.swf')
+        os.remove(DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+'.swf')
 
 def concat_videos(max_time, guid):
     """Concatonate all the videos together, into one video file.
@@ -148,20 +156,20 @@ def concat_videos(max_time, guid):
     # create dictionary of all input files
     input_dict = {}
     for time in range(0, max_time+1, 8000):
-        input_dict[guid+"/"+'{0:08d}'.format(time)+'.mkv'] = None
+        input_dict[DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+'.mkv'] = None
 
     # run FFmpeg
     ff_command = ffmpy.FFmpeg(
         inputs=input_dict,
         outputs={
-            guid+"/video_output.mkv":
+            DOWNLOAD_DIRECTORY + "/" + guid+"/video_output.mkv":
             '-filter_complex "concat=n={}:v=1 [v] " -map [v]'.format(len(input_dict))
             }
     )
     ff_command.run()
 
     for time in range(0, max_time+1, 8000):
-        os.remove(guid+"/"+'{0:08d}'.format(time)+'.mkv')
+        os.remove(DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+'.mkv')
 
 def trim_audio_file(guid):
     """Trims the audio file to remove the qut intro sound.
@@ -173,11 +181,11 @@ def trim_audio_file(guid):
         - guid (str): The lecture's guid
     """
     ff_command = ffmpy.FFmpeg(
-        inputs={guid+"/audio.mp3":None},
-        outputs={guid+"/trimmed_audio.mp3":"-ss 00:00:14 -acodec copy"}
+        inputs={DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3":None},
+        outputs={DOWNLOAD_DIRECTORY + "/" + guid+"/trimmed_audio.mp3":"-ss 00:00:14 -acodec copy"}
     )
     ff_command.run()
-    os.remove(guid+"/audio.mp3")
+    os.remove(DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3")
 
 def combine_audio_and_video(guid, video_path):
     """Combine the trimmed audio and the concatonated video files.
@@ -192,10 +200,12 @@ def combine_audio_and_video(guid, video_path):
         video_path also requires the file name and extension.
     """
     ff_command = ffmpy.FFmpeg(
-        inputs={guid+"/video_output.mkv": None, guid+"/trimmed_audio.mp3": None},
+        inputs={DOWNLOAD_DIRECTORY + "/" + guid+"/video_output.mkv": None, DOWNLOAD_DIRECTORY
+                + "/" + guid+"/trimmed_audio.mp3": None},
         outputs={video_path: "-codec copy -shortest"}
     )
     ff_command.run()
+    os.remove(DOWNLOAD_DIRECTORY + "/" + guid)
 
 def high_quality_download(url, video_path):
     """Download a lecture from Echo360 in high quality.
