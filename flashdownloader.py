@@ -77,6 +77,7 @@ def get_max_time(xmldoc):
 
 def get_title(xmldoc):
     title = str(xmldoc.getElementsByTagName("name")[0].firstChild.nodeValue)
+    return title
 
 def get_guid(xmldoc):
     """Get the guid from the presentation xml document.
