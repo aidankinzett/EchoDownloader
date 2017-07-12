@@ -8,10 +8,6 @@ Functions to:
     - Move and rename files (including HQ from flash downloader)
 
 Uses configuration from "config.yml"
-
-Todo:
-    * Add error handling
-    * More comments
 """
 import os
 import re
@@ -59,6 +55,11 @@ def get_video_info(rss_feed):
     cursor = conn.cursor()
 
     parsed_feed = feedparser.parse(rss_feed)
+
+    # check that url is a valid lecture feed
+    if not parsed_feed.entries:
+        print("{} is not a valid lecture RSS feed".format(rss_feed))
+
     for entry in parsed_feed.entries:
         # regex to find subject code
         codefind = re.findall(r'Course ID:.*?<br', str(entry))
@@ -216,5 +217,4 @@ def get_video_path(video_info, extension):
 
     return video_path
 
-test_videos = get_video_info(RSS_FEEDS[0])
-download_all_videos([test_videos[2]])
+test_videos = get_video_info("www.google.com")

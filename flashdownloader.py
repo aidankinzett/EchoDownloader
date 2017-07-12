@@ -3,6 +3,14 @@
 From a given URl can download the individual .swf file, convert and stitch
 them together. Also downloads the audio file, and adds that to the video.
 
+Include the URL for the lecture as a command line argument when running the script.
+The video will be saved in the download directory specified in the configuration file,
+named with the title provided by Echo360. The URL to use can be found in the RSS feed
+for the lecture.
+
+Example URL: ...
+Does not work with URLs like: ...
+
 Todo:
     * Progress bars and console logs
     * Maybe add the QUT intro to the videos
@@ -10,8 +18,10 @@ Todo:
 from urllib.request import urlopen, URLopener
 from xml.dom import minidom
 import os
+import sys
 import ffmpy
 import yaml
+
 
 # open the configuration file and save config as constants
 with open("config.yml", 'r') as ymlfile:
@@ -64,6 +74,9 @@ def get_max_time(xmldoc):
             if dtime > max_time:
                 max_time = dtime
     return max_time
+
+def get_title(xmldoc):
+    title = str(xmldoc.getElementsByTagName("name")[0].firstChild.nodeValue)
 
 def get_guid(xmldoc):
     """Get the guid from the presentation xml document.
@@ -228,3 +241,8 @@ def high_quality_download(url, video_path):
     concat_videos(max_time, guid)
     trim_audio_file(guid)
     combine_audio_and_video(guid, video_path)
+
+if len(sys.argv) != 2:
+    print("Enter url for lecture as a command line argument")
+else:
+    high_quality_download(sys.argv[1], DOWNLOAD_DIRECTORY+"/"+get_title(sys.argv[1])+".mkv")
