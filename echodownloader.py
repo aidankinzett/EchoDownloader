@@ -174,11 +174,12 @@ def download_all_videos(videos):
     if HIGH_QUALITY:
         for video_info in videos:
             video_path = get_video_path(video_info, '.mkv')
-            print("Downloading {}".format(video_info[2]))
+            print("Downloading {} from subject {} in high quality".format(video_info[2], video_info[1]))
             try:
                 flashdownloader.high_quality_download(video_info[0], video_path)
             except:
-                download_video_file(video_info[0], video_path[:-4]+".mp4")
+                video_path = get_video_path(video_info, '.mp4')
+                download_video_file(video_info, video_path)
             mark_db_downloaded(video_info)
     else:
         for video_info in videos:

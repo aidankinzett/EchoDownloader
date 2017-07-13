@@ -110,8 +110,16 @@ def download_swf_video_file(time, url, guid):
 
     """
     URLopener().retrieve(url+"/slides/"+'{0:08d}'.format(time)+".swf", DOWNLOAD_DIRECTORY
-                         + "/" + guid +"/" + '{0:08d}'.format(time)+".swf")
+                         + "/" + guid +"/" + '{0:08d}'.format(time)+".swf", reporthook=download_progress_bar)
 
+def download_progress_bar(count, block_size, total_size):
+    """To provide a progress bar to show when downloading files."""
+    percent = int(count*block_size*100/total_size)
+    numhash = int(percent/5)
+    numdash = int(20 - numhash)
+    sys.stdout.write("\r" + "[" + numhash*"#" + numdash*"-" + "] {0}%".format(percent))
+
+    sys.stdout.flush()
 
 def download_all_swf_videos(max_time, url, guid):
     """Download all the videos from time 0 to time max_time.
@@ -124,6 +132,7 @@ def download_all_swf_videos(max_time, url, guid):
         - guid (str): The lecture's guid
     """
     for time in range(0, max_time+1, 8000):
+        print("\nDownloading file {} of {}...".format(str(time/8000+1), str(max_time/8000+1)))
         download_swf_video_file(time, url, guid)
 
 def download_audio_file(url, guid):
@@ -137,7 +146,8 @@ def download_audio_file(url, guid):
         - guid (str): The lecture's guid
 
     """
-    URLopener().retrieve(url+"/audio.mp3", DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3")
+    print("Downloading audio file")
+    URLopener().retrieve(url+"/audio.mp3", DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3", reporthook=download_progress_bar)
 
 def convert_videos(max_time, guid):
     """Convert all the swf files to mkv files.
@@ -246,9 +256,9 @@ def high_quality_download(url, video_path):
     trim_audio_file(guid)
     combine_audio_and_video(guid, video_path)
 
-if len(sys.argv) =! 2 and sys.argv[:-19] == "flashdownloader.py":
+if len(sys.argv) != 2 and sys.argv[:-19] == "flashdownloader.py":
     print("Enter url for lecture as a command line argument")
-else:
+elif sys.argv[:-19] == "flashdownloader.py":
     url = sys.argv[1]
     newurl = get_swf_url(url)
     xmldoc = get_xml(newurl)
