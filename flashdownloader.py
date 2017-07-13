@@ -7,8 +7,11 @@ Include the URL for the lecture as a command line argument when running the scri
 The video will be saved in the download directory specified in the configuration file,
 named with the GUID. The URL to use can be found in the RSS feed for the lecture.
 
-Example URL: ...
-Does not work with URLs like: ...
+Example URL:
+http://lectureplayback.qut.edu.au/1723/3/b526eb48-ddb7-418a-8051-3b7b4295dbc7/whatever
+
+Does not work with URLs like:
+http://lecturecapture.qut.edu.au/ess/echo/presentation/b526eb48-ddb7-418a-8051-3b7b4295dbc7/whatever
 
 Todo:
     * Moar progress bars
@@ -39,7 +42,10 @@ def get_swf_url(rssurl):
         - str: base URL for lecture, to be used with other functions in this module
 
     """
-    return rssurl[:78]
+    if rssurl[:4]=="https":
+        return rssurl[:79]
+    else:
+        return rssurl[:78]
 
 def get_xml(url):
     """Download the presentation xml document.
@@ -132,7 +138,7 @@ def download_all_swf_videos(max_time, url, guid):
         - guid (str): The lecture's guid
     """
     for time in range(0, max_time+1, 8000):
-        print("\nDownloading video file {:.0f} of {:.0f}...".format(str(time/8000+1), str(max_time/8000+1)))
+        print("\nDownloading video file {:.0f} of {:.0f}...".format(time/8000+1, max_time/8000+1))
         download_swf_video_file(time, url, guid)
 
 def download_audio_file(url, guid):
@@ -258,9 +264,9 @@ def high_quality_download(url, video_path):
     trim_audio_file(guid)
     combine_audio_and_video(guid, video_path)
 
-if len(sys.argv) != 2 and sys.argv[:-19] == "flashdownloader.py":
+if len(sys.argv) != 2 and sys.argv[0][-19:] == "flashdownloader.py":
     print("Enter url for lecture as a command line argument")
-elif sys.argv[:-19] == "flashdownloader.py":
+elif sys.argv[0][-19:] == "flashdownloader.py":
     url = sys.argv[1]
     newurl = get_swf_url(url)
     xmldoc = get_xml(newurl)

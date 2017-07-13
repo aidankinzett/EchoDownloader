@@ -24,7 +24,7 @@ with open("config.yml", 'r') as ymlfile:
 
 RSS_FEEDS = CONFIG['rss feeds']
 DOWNLOAD_DIRECTORY = CONFIG['download directory']
-DB_PATH = DOWNLOAD_DIRECTORY + '/echodownloader.db'
+DB_PATH = os.path.join(DOWNLOAD_DIRECTORY, 'echodownloader.db')
 HIGH_QUALITY = CONFIG['high quality']
 SORT = CONFIG['sort into subject folders']
 VIDEO_FOLDER_NAME = CONFIG['folder name within subject folder']
