@@ -2,7 +2,7 @@
 EchoDownloader is a Python 3 script that checks multiple echo360 lecture recording RSS feeds, downloads any new lectures, then renames and sorts them into subject folders. It can also download videos in high resolution, which is not possible through the website.
 
 ## Setup
-Requires "vodcast" RSS feed url, found at the bottom of the subject's echo360 page. Add RSS feeds to the config.yml configuration file. Run the script regularly, such as on a crontab, to keep the downloads up to date. On first run will download all lectures available in the feed.
+Requires "vodcast" RSS feed url, found at the bottom left of the subject's Echo360 page. Add RSS feeds to the config.yml configuration file. Run the echodownloader script regularly, such as on a crontab, to keep the downloads up to date. On first run all lectures available in the feed will be downloaded.
 
 ### Requirements (install through pip):
 - PyYAML

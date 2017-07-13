@@ -11,11 +11,10 @@ Example URL: ...
 Does not work with URLs like: ...
 
 Todo:
-    * Progress bars and console logs
+    * Moar progress bars
     * Maybe add the QUT intro to the videos
-    * Replace / with os.path.join, cause this wont work on windows
     * Restructure how the video path works, so that when run from the command
-      line, it saves with the correct name.
+      line, it saves with the correct name
 """
 from urllib.request import urlopen, URLopener
 from xml.dom import minidom
@@ -94,8 +93,8 @@ def get_guid(xmldoc):
 
     """
     guid = str(xmldoc.getElementsByTagName("guid")[0].firstChild.nodeValue)
-    if not os.path.exists(DOWNLOAD_DIRECTORY+"/"+guid):
-        os.makedirs(DOWNLOAD_DIRECTORY+"/"+guid)
+    if not os.path.exists(os.path.join(DOWNLOAD_DIRECTORY,guid)):
+        os.makedirs(os.path.join(DOWNLOAD_DIRECTORY,guid))
     return guid
 
 def download_swf_video_file(time, url, guid):
@@ -109,8 +108,9 @@ def download_swf_video_file(time, url, guid):
         - guid (str): The lecture's guid
 
     """
-    URLopener().retrieve(url+"/slides/"+'{0:08d}'.format(time)+".swf", DOWNLOAD_DIRECTORY
-                         + "/" + guid +"/" + '{0:08d}'.format(time)+".swf", reporthook=download_progress_bar)
+    URLopener().retrieve(url+"/slides/"+'{0:08d}'.format(time)+".swf",
+                         os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+".swf"),
+                         reporthook=download_progress_bar)
 
 def download_progress_bar(count, block_size, total_size):
     """To provide a progress bar to show when downloading files."""
@@ -132,7 +132,7 @@ def download_all_swf_videos(max_time, url, guid):
         - guid (str): The lecture's guid
     """
     for time in range(0, max_time+1, 8000):
-        print("\nDownloading file {} of {}...".format(str(time/8000+1), str(max_time/8000+1)))
+        print("\nDownloading video file {:.0f} of {:.0f}...".format(str(time/8000+1), str(max_time/8000+1)))
         download_swf_video_file(time, url, guid)
 
 def download_audio_file(url, guid):
@@ -146,8 +146,9 @@ def download_audio_file(url, guid):
         - guid (str): The lecture's guid
 
     """
-    print("Downloading audio file")
-    URLopener().retrieve(url+"/audio.mp3", DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3", reporthook=download_progress_bar)
+    print("\nDownloading audio file")
+    URLopener().retrieve(url+"/audio.mp3", os.path.join(DOWNLOAD_DIRECTORY, guid, "audio.mp3"),
+                         reporthook=download_progress_bar)
 
 def convert_videos(max_time, guid):
     """Convert all the swf files to mkv files.
@@ -161,11 +162,11 @@ def convert_videos(max_time, guid):
     """
     for time in range(0, max_time+1, 8000):
         ff_command = ffmpy.FFmpeg(
-            inputs={DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+'.swf': None},
-            outputs={DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+".mkv": None}
+            inputs={os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+'.swf'): None},
+            outputs={os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+".mkv"): None}
             )
         ff_command.run()
-        os.remove(DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+'.swf')
+        os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+'.swf'))
 
 def concat_videos(max_time, guid):
     """Concatonate all the videos together, into one video file.
@@ -181,20 +182,20 @@ def concat_videos(max_time, guid):
     # create dictionary of all input files
     input_dict = {}
     for time in range(0, max_time+1, 8000):
-        input_dict[DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+'.mkv'] = None
+        input_dict[os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+'.mkv')] = None
 
     # run FFmpeg
     ff_command = ffmpy.FFmpeg(
         inputs=input_dict,
         outputs={
-            DOWNLOAD_DIRECTORY + "/" + guid+"/video_output.mkv":
+            os.path.join(DOWNLOAD_DIRECTORY, guid, "video_output.mkv"):
             '-filter_complex "concat=n={}:v=1 [v] " -map [v]'.format(len(input_dict))
             }
     )
     ff_command.run()
 
     for time in range(0, max_time+1, 8000):
-        os.remove(DOWNLOAD_DIRECTORY + "/" + guid+"/"+'{0:08d}'.format(time)+'.mkv')
+        os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+'.mkv'))
 
 def trim_audio_file(guid):
     """Trims the audio file to remove the qut intro sound.
@@ -206,11 +207,11 @@ def trim_audio_file(guid):
         - guid (str): The lecture's guid
     """
     ff_command = ffmpy.FFmpeg(
-        inputs={DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3":None},
-        outputs={DOWNLOAD_DIRECTORY + "/" + guid+"/trimmed_audio.mp3":"-ss 00:00:15 -acodec copy"}
+        inputs={os.path.join(DOWNLOAD_DIRECTORY, guid, "audio.mp3"):None},
+        outputs={os.path.join(DOWNLOAD_DIRECTORY, guid, "trimmed_audio.mp3"):"-ss 00:00:15 -acodec copy"}
     )
     ff_command.run()
-    os.remove(DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3")
+    os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, "audio.mp3"))
 
 def combine_audio_and_video(guid, video_path):
     """Combine the trimmed audio and the concatonated video files.
@@ -225,14 +226,14 @@ def combine_audio_and_video(guid, video_path):
         video_path also requires the file name and extension.
     """
     ff_command = ffmpy.FFmpeg(
-        inputs={DOWNLOAD_DIRECTORY + "/" + guid+"/video_output.mkv": None, DOWNLOAD_DIRECTORY
-                + "/" + guid+"/trimmed_audio.mp3": None},
+        inputs={os.path.join(DOWNLOAD_DIRECTORY, guid, "video_output.mkv"): None,
+                os.path.join(DOWNLOAD_DIRECTORY, guid, "trimmed_audio.mp3"): None},
         outputs={video_path: "-codec copy -shortest"}
     )
     ff_command.run()
-    os.remove(DOWNLOAD_DIRECTORY + "/" + guid + "/video_output.mkv")
-    os.remove(DOWNLOAD_DIRECTORY + "/" + guid + "/trimmed_audio.mp3")
-    os.rmdir(DOWNLOAD_DIRECTORY + "/" + guid)
+    os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, "video_output.mkv"))
+    os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, "trimmed_audio.mp3"))
+    os.rmdir(os.path.join(DOWNLOAD_DIRECTORY, guid))
 
 def high_quality_download(url, video_path):
     """Download a lecture from Echo360 in high quality.
@@ -247,7 +248,8 @@ def high_quality_download(url, video_path):
     """
     newurl = get_swf_url(url)
     xmldoc = get_xml(newurl)
-    max_time = get_max_time(xmldoc)
+    # max_time = get_max_time(xmldoc)
+    max_time = 16000
     guid = get_guid(xmldoc)
     download_all_swf_videos(max_time, newurl, guid)
     download_audio_file(newurl, guid)
@@ -264,6 +266,6 @@ elif sys.argv[:-19] == "flashdownloader.py":
     xmldoc = get_xml(newurl)
     guid = get_guid(xmldoc)
     try:
-        high_quality_download(sys.argv[1], DOWNLOAD_DIRECTORY+"/"+guid+".mkv")
+        high_quality_download(sys.argv[1], os.path.join(DOWNLOAD_DIRECTORY, guid+".mkv"))
     except:
-        URLopener().retrieve(sys.argv[1], DOWNLOAD_DIRECTORY+"/"+guid+".mp4")
+        URLopener().retrieve(sys.argv[1], os.path.join(DOWNLOAD_DIRECTORY, guid+".mp4"))
