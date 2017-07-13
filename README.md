@@ -1,5 +1,5 @@
 # EchoDownloader
-EchoDownloader checks multiple echo360 lecture recording RSS feeds, downloads any new lectures, then renames and sorts them into subject folders. It can also download videos in high resolution, which is not possible through the website.
+EchoDownloader is a Python 3 script that checks multiple echo360 lecture recording RSS feeds, downloads any new lectures, then renames and sorts them into subject folders. It can also download videos in high resolution, which is not possible through the website.
 
 ## Setup
 Requires "vodcast" RSS feed url, found at the bottom of the subject's echo360 page. Add RSS feeds to the config.yml configuration file. Run the script regularly, such as on a crontab, to keep the downloads up to date. On first run will download all lectures available in the feed.
@@ -29,4 +29,4 @@ eg. Download Directory/IFB101/Lecture Videos/
 Download video in higher quality (720p).
 
 ## High Quality downloads
-High quality downloads require transcoding, so will take more time, and be more CPU intensive than low quality downloads. To download a single video, without using EchoDownloader, call the flashdownloader python file, followed by the URL for the lecture video as a command line argument. This video will be saved to the Download Directory specified in the config file. If the high quality video cannot be found, then the low quality version will be downloaded.
+High quality downloads require transcoding, so will take more time, and be more CPU intensive than low quality downloads. To download a single video, without using the EchoDownloader RSS checker, call the flashdownloader python file, followed by the URL for the lecture video as a command line argument. This video will be saved to the Download Directory specified in the config file. If the high quality video cannot be found, then the low quality version will be downloaded.

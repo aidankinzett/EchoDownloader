@@ -175,7 +175,7 @@ def download_all_videos(videos):
             try:
                 flashdownloader.high_quality_download(video_info[0], video_path)
             except:
-                download_video_file(video_info[0], video_path)
+                download_video_file(video_info[0], video_path[:-4]+".mp4")
             mark_db_downloaded(video_info)
     else:
         for video_info in videos:
@@ -219,3 +219,9 @@ def get_video_path(video_info, extension):
             video_path = DOWNLOAD_DIRECTORY + '/' + video_info[1] + '/' + video_info[2] + extension
 
     return video_path
+
+check_database_exists()
+for feed in RSS_FEEDS:
+    videos = get_video_info(feed)
+    new_videos = check_database(videos)
+    download_all_videos(new_videos)

@@ -246,11 +246,14 @@ def high_quality_download(url, video_path):
     trim_audio_file(guid)
     combine_audio_and_video(guid, video_path)
 
-if len(sys.argv) != 2:
+if len(sys.argv) =! 2 and sys.argv[:-19] == "flashdownloader.py":
     print("Enter url for lecture as a command line argument")
 else:
     url = sys.argv[1]
     newurl = get_swf_url(url)
     xmldoc = get_xml(newurl)
     guid = get_guid(xmldoc)
-    high_quality_download(sys.argv[1], DOWNLOAD_DIRECTORY+"/"+guid+".mkv")
+    try:
+        high_quality_download(sys.argv[1], DOWNLOAD_DIRECTORY+"/"+guid+".mkv")
+    except:
+        URLopener().retrieve(sys.argv[1], DOWNLOAD_DIRECTORY+"/"+guid+".mp4")
