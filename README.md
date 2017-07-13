@@ -5,9 +5,9 @@ EchoDownloader checks multiple echo360 lecture recording RSS feeds, downloads an
 Requires "vodcast" RSS feed url, found at the bottom of the subject's echo360 page. Add RSS feeds to the config.yml configuration file. Run the script regularly, such as on a crontab, to keep the downloads up to date.
 
 ### Requirements (install through pip):
-PyYAML
-feedparser
-ffmpy
+- PyYAML
+- feedparser
+- ffmpy
 
 ### Configuration
 Configuration is read from the config.yml YAML file.
