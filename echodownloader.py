@@ -49,6 +49,7 @@ def get_video_info(rss_feed):
         list: List of found videos in format [[url,subject code, video title],...]
 
     """
+    print("Checking RSS feeds...")
     videos = []
 
     conn = sqlite3.connect(DB_PATH)
@@ -99,6 +100,7 @@ def check_database(videos):
         list: List of videos that have not been downloaded
 
     """
+    print("Checking Database...")
     new_videos = []
 
     # connect to database
@@ -139,7 +141,7 @@ def download_video_file(video_info, video_path):
 
     """
     # log the video to be downloaded
-    print("Downloading {} from subejct {}".format(video_info[2], video_info[1]))
+    print("Downloading {} from subject {}".format(video_info[2], video_info[1]))
 
     # download video
     URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
@@ -172,6 +174,7 @@ def download_all_videos(videos):
     if HIGH_QUALITY:
         for video_info in videos:
             video_path = get_video_path(video_info, '.mkv')
+            print("Downloading {}".format(video_info[2]))
             try:
                 flashdownloader.high_quality_download(video_info[0], video_path)
             except:
