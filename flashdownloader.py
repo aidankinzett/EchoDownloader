@@ -254,8 +254,7 @@ def high_quality_download(url, video_path):
     """
     newurl = get_swf_url(url)
     xmldoc = get_xml(newurl)
-    # max_time = get_max_time(xmldoc)
-    max_time = 16000
+    max_time = get_max_time(xmldoc)
     guid = get_guid(xmldoc)
     download_all_swf_videos(max_time, newurl, guid)
     download_audio_file(newurl, guid)

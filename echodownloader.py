@@ -208,7 +208,7 @@ def get_video_path(video_info, extension):
     if SORT:
 
         # if subject code directory does not exist, create it
-        if not os.path.exists(os.path.join(DOWNLOAD_DIRECTORY,video_info[1])):
+        if not os.path.exists(os.path.join(DOWNLOAD_DIRECTORY, video_info[1])):
             os.makedirs(os.path.join(DOWNLOAD_DIRECTORY, video_info[1]))
 
         # if to be placed within another folder
