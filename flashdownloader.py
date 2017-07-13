@@ -1,12 +1,11 @@
 """Download higher quality videos from Echo360.
 
-From a given URl can download the individual .swf file, convert and stitch
+From a given URL can download the individual .swf file, convert and stitch
 them together. Also downloads the audio file, and adds that to the video.
 
 Include the URL for the lecture as a command line argument when running the script.
 The video will be saved in the download directory specified in the configuration file,
-named with the title provided by Echo360. The URL to use can be found in the RSS feed
-for the lecture.
+named with the GUID. The URL to use can be found in the RSS feed for the lecture.
 
 Example URL: ...
 Does not work with URLs like: ...
@@ -14,6 +13,9 @@ Does not work with URLs like: ...
 Todo:
     * Progress bars and console logs
     * Maybe add the QUT intro to the videos
+    * Replace / with os.path.join, cause this wont work on windows
+    * Restructure how the video path works, so that when run from the command
+      line, it saves with the correct name.
 """
 from urllib.request import urlopen, URLopener
 from xml.dom import minidom
@@ -21,7 +23,6 @@ import os
 import sys
 import ffmpy
 import yaml
-
 
 # open the configuration file and save config as constants
 with open("config.yml", 'r') as ymlfile:
@@ -93,8 +94,8 @@ def get_guid(xmldoc):
 
     """
     guid = str(xmldoc.getElementsByTagName("guid")[0].firstChild.nodeValue)
-    if not os.path.exists(guid):
-        os.makedirs(guid)
+    if not os.path.exists(DOWNLOAD_DIRECTORY+"/"+guid):
+        os.makedirs(DOWNLOAD_DIRECTORY+"/"+guid)
     return guid
 
 def download_swf_video_file(time, url, guid):
@@ -189,14 +190,14 @@ def trim_audio_file(guid):
     """Trims the audio file to remove the qut intro sound.
 
     Trims the audio file name "audio.mp3" contained within the GUID folder to
-    remove the first 14 seconds.
+    remove the first 15 seconds.
 
     Args:
         - guid (str): The lecture's guid
     """
     ff_command = ffmpy.FFmpeg(
         inputs={DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3":None},
-        outputs={DOWNLOAD_DIRECTORY + "/" + guid+"/trimmed_audio.mp3":"-ss 00:00:14 -acodec copy"}
+        outputs={DOWNLOAD_DIRECTORY + "/" + guid+"/trimmed_audio.mp3":"-ss 00:00:15 -acodec copy"}
     )
     ff_command.run()
     os.remove(DOWNLOAD_DIRECTORY + "/" + guid+"/audio.mp3")
@@ -219,7 +220,9 @@ def combine_audio_and_video(guid, video_path):
         outputs={video_path: "-codec copy -shortest"}
     )
     ff_command.run()
-    os.remove(DOWNLOAD_DIRECTORY + "/" + guid)
+    os.remove(DOWNLOAD_DIRECTORY + "/" + guid + "/video_output.mkv")
+    os.remove(DOWNLOAD_DIRECTORY + "/" + guid + "/trimmed_audio.mp3")
+    os.rmdir(DOWNLOAD_DIRECTORY + "/" + guid)
 
 def high_quality_download(url, video_path):
     """Download a lecture from Echo360 in high quality.
@@ -246,4 +249,8 @@ def high_quality_download(url, video_path):
 if len(sys.argv) != 2:
     print("Enter url for lecture as a command line argument")
 else:
-    high_quality_download(sys.argv[1], DOWNLOAD_DIRECTORY+"/"+get_title(sys.argv[1])+".mkv")
+    url = sys.argv[1]
+    newurl = get_swf_url(url)
+    xmldoc = get_xml(newurl)
+    guid = get_guid(xmldoc)
+    high_quality_download(sys.argv[1], DOWNLOAD_DIRECTORY+"/"+guid+".mkv")
