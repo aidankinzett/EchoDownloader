@@ -1,0 +1,19 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Echo Downloader</title>
+    </head>
+    <body>
+        <h3>MXB104</h3>
+        <ul>
+        {% for item in videos %}
+            <li>{% for data in item %}
+                {{data}},
+                {% endfor %}
+            </li>
+        {% endfor %}
+        </ul>
+
+    </body>
+
+</html>
