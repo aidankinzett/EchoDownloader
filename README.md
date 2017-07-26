@@ -28,5 +28,6 @@ eg. Download Directory/IFB101/Lecture Videos/
 #### High Quality (Yes/No):
 Download video in higher quality (720p).
 
+
 ## High Quality downloads
-High quality downloads require transcoding, so will take more time, and be more CPU intensive than low quality downloads. To download a single video, without using the EchoDownloader RSS checker, call the flashdownloader python file, followed by the URL for the lecture video as a command line argument. This video will be saved to the Download Directory specified in the config file. If the high quality video cannot be found, then the low quality version will be downloaded.
+High quality downloads require transcoding, so will take much more time, and be more CPU intensive than low quality downloads. I suggest only enabling this if the script is running on a powerful machine, and you don't care how long it takes for the file to be available to you. To download a single video, without using the EchoDownloader RSS checker, call the flashdownloader python file, followed by the URL for the lecture video as a command line argument. This video will be saved to the Download Directory specified in the config file. If the high quality video cannot be found, then the low quality version will be downloaded.
