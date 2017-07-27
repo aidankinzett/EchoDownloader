@@ -14,6 +14,7 @@ Does not work with URLs like:
 http://lecturecapture.qut.edu.au/ess/echo/presentation/b526eb48-ddb7-418a-8051-3b7b4295dbc7/whatever
 
 Todo:
+    * Move the temp folder so that dropbox doesnt see it
     * Moar progress bars
     * Maybe add the QUT intro to the videos
     * Restructure how the video path works, so that when run from the command
@@ -206,6 +207,8 @@ def concat_videos(max_time, guid):
 
     for time in range(0, max_time+1, 8000):
         os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+'.mkv'))
+
+    os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, "input.txt"))
 
 def trim_audio_file(guid):
     """Trims the audio file to remove the qut intro sound.
