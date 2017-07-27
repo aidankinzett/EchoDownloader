@@ -185,17 +185,21 @@ def concat_videos(max_time, guid):
         - guid (str): The lecture's guid
 
     """
-    # create dictionary of all input files
-    input_dict = {}
+    # create text file of all input files
+    file = open(os.path.join(DOWNLOAD_DIRECTORY, guid, "input.txt"), "w")
+
     for time in range(0, max_time+1, 8000):
-        input_dict[os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+'.mkv')] = None
+        file.write("file '" + os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time))+".mkv'\n")
+
+    file.close()
 
     # run FFmpeg
     ff_command = ffmpy.FFmpeg(
-        inputs=input_dict,
+        inputs= {
+            os.path.join(DOWNLOAD_DIRECTORY, guid, "input.txt"):"-f concat -safe 0"
+            },
         outputs={
-            os.path.join(DOWNLOAD_DIRECTORY, guid, "video_output.mkv"):
-            '-filter_complex "concat=n={}:v=1 [v] " -map [v]'.format(len(input_dict))
+            os.path.join(DOWNLOAD_DIRECTORY, guid, "video_output.mkv"):"-codec copy"
             }
     )
     ff_command.run()
