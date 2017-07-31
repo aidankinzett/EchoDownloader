@@ -35,7 +35,7 @@ def check_database_exists():
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute('CREATE TABLE "urls" (`URL` TEXT, `Subject Code` TEXT,'+
-                       '`Title` TEXT , `Downloaded` INTEGER, UNIQUE(`URL`))')
+                       '`Title` TEXT , `Downloaded` INTEGER, `GUID` TEXT, UNIQUE(`URL`))')
 
 def get_video_info(rss_feed):
     """Return info for all videos found in the given RSS feed.
@@ -76,9 +76,11 @@ def get_video_info(rss_feed):
                 if dictionary['type'] == 'video/mp4':
                     url = dictionary['href']
 
-        videos.append([url, code, title])
+        guid = url[41:-14]
 
-        cursor.execute("INSERT OR IGNORE INTO urls VALUES (?,?,?,0)", [url, code, title])
+        videos.append([url, code, title, guid])
+
+        cursor.execute("INSERT OR IGNORE INTO urls VALUES (?,?,?,0,?)", [url, code, title,guid])
 
     conn.commit()
     conn.close()

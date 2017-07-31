@@ -4,13 +4,10 @@
         <title>Echo Downloader</title>
     </head>
     <body>
-        <h3>MXB104</h3>
+        <h3>{{ subject_code }}</h3>
         <ul>
         {% for item in videos %}
-            <li>{% for data in item %}
-                {{data}},
-                {% endfor %}
-            </li>
+            <li><a href="{{ url_for('open_video', guid=item[4]) }}">{{ item[2] }}</a></li>
         {% endfor %}
         </ul>
 
