@@ -14,6 +14,7 @@ Does not work with URLs like:
 http://lecturecapture.qut.edu.au/ess/echo/presentation/b526eb48-ddb7-418a-8051-3b7b4295dbc7/whatever
 
 Todo:
+    * Move the temp folder so that dropbox doesnt see it
     * Moar progress bars
     * Maybe add the QUT intro to the videos
     * Restructure how the video path works, so that when run from the command
@@ -185,23 +186,29 @@ def concat_videos(max_time, guid):
         - guid (str): The lecture's guid
 
     """
-    # create dictionary of all input files
-    input_dict = {}
+    # create text file of all input files
+    file = open(os.path.join(DOWNLOAD_DIRECTORY, guid, "input.txt"), "w")
+
     for time in range(0, max_time+1, 8000):
-        input_dict[os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+'.mkv')] = None
+        file.write("file '" + os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time))+".mkv'\n")
+
+    file.close()
 
     # run FFmpeg
     ff_command = ffmpy.FFmpeg(
-        inputs=input_dict,
+        inputs= {
+            os.path.join(DOWNLOAD_DIRECTORY, guid, "input.txt"):"-f concat -safe 0"
+            },
         outputs={
-            os.path.join(DOWNLOAD_DIRECTORY, guid, "video_output.mkv"):
-            '-filter_complex "concat=n={}:v=1 [v] " -map [v]'.format(len(input_dict))
+            os.path.join(DOWNLOAD_DIRECTORY, guid, "video_output.mkv"):"-codec copy"
             }
     )
     ff_command.run()
 
     for time in range(0, max_time+1, 8000):
         os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time)+'.mkv'))
+
+    os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, "input.txt"))
 
 def trim_audio_file(guid):
     """Trims the audio file to remove the qut intro sound.
