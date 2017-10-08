@@ -15,7 +15,15 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "hi"
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT DISTINCT `Subject Code` FROM urls")
+    subjects = cursor.fetchall()
+
+    conn.commit()
+    conn.close()
+    return render_template('home.html', subjects=subjects)
 
 @app.route('/subject/<subject_code>')
 def display_subject(subject_code=None):
