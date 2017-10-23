@@ -35,7 +35,7 @@ def check_database_exists():
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         cursor.execute('CREATE TABLE "urls" (`URL` TEXT, `Subject Code` TEXT,'+
-                       '`Title` TEXT , `Downloaded` INTEGER, `GUID` TEXT, UNIQUE(`URL`))')
+                       '`Title` TEXT , `Downloaded` INTEGER, `GUID` TEXT, `Watched` INTEGER, UNIQUE(`URL`))')
 
 def get_video_info(rss_feed):
     """Return info for all videos found in the given RSS feed.
@@ -62,25 +62,29 @@ def get_video_info(rss_feed):
         print("{} is not a valid lecture RSS feed".format(rss_feed))
 
     for entry in parsed_feed.entries:
-        # regex to find subject code
-        codefind = re.findall(r'Course ID:.*?<br', str(entry))
-        code = codefind[0][11:-3]
-
-        # get title from rss info
-        title = entry.title
-
         # go through the info provided and find the video link
-        enclose = entry.enclosures
-        for dictionary in enclose:
-            if 'type' in dictionary:
-                if dictionary['type'] == 'video/mp4':
-                    url = dictionary['href']
+        try:
+            enclose = entry.enclosures
+            for dictionary in enclose:
+                if 'type' in dictionary:
+                    if dictionary['type'] == 'video/mp4':
+                        url = dictionary['href']
 
-        guid = url[41:-14]
+            # regex to find subject code
+            codefind = re.findall(r'Course ID:.*?<br', str(entry))
+            code = codefind[0][11:-3]
 
-        videos.append([url, code, title, guid])
+            # get title from rss info
+            title = entry.title
 
-        cursor.execute("INSERT OR IGNORE INTO urls VALUES (?,?,?,0,?)", [url, code, title,guid])
+            guid = url[41:-14]
+
+            videos.append([url, code, title, guid])
+
+            cursor.execute("INSERT OR IGNORE INTO urls VALUES (?,?,?,0,?)", [url, code, title, guid])
+
+        except AttributeError:
+            print("Video entry found in RSS, but no link was provided")
 
     conn.commit()
     conn.close()
@@ -149,7 +153,7 @@ def download_video_file(video_info, video_path):
     URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
     print("Finished downloading")
 
-def mark_db_downloaded(video_info):
+def mark_db_downloaded(video_info, quality):
     """Update video in database after downloading.
 
     Uses database specified in configuration file.
@@ -161,7 +165,10 @@ def mark_db_downloaded(video_info):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE urls SET `Downloaded` = 1 WHERE `URL` = ?", [video_info[0]])
+    if quality == "lq":
+        cursor.execute("UPDATE urls SET `Downloaded` = 1 WHERE `URL` = ?", [video_info[0]])
+    else:
+        cursor.execute("UPDATE urls SET `Downloaded` = 2 WHERE `URL` = ?", [video_info[0]])
 
     # close connection to database
     conn.commit()
@@ -182,12 +189,12 @@ def download_all_videos(videos):
             except:
                 video_path = get_video_path(video_info, '.mp4')
                 download_video_file(video_info, video_path)
-            mark_db_downloaded(video_info)
+            mark_db_downloaded(video_info, 'hq')
     else:
         for video_info in videos:
             video_path = get_video_path(video_info, '.mp4')
             download_video_file(video_info, video_path)
-            mark_db_downloaded(video_info)
+            mark_db_downloaded(video_info, 'lq')
 
 def get_video_path(video_info, extension):
     """Work out the path that the video needs to be saved to.

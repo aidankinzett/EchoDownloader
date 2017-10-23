@@ -23,8 +23,12 @@ def home():
 
     conn.commit()
     conn.close()
-    return render_template('home.html', subjects=subjects)
 
+    clean_subjects = []
+    for subject in subjects:
+        clean_subjects.append(subject[0])
+
+    return render_template('index.html', subjects=clean_subjects)
 @app.route('/subject/<subject_code>')
 def display_subject(subject_code=None):
     conn = sqlite3.connect(DB_PATH)
