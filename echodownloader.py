@@ -18,6 +18,9 @@ import yaml
 import feedparser
 import flashdownloader
 
+
+# CHANGES!
+
 # open the configuration file and save config as constants
 with open("config.yml", 'r') as ymlfile:
     CONFIG = yaml.load(ymlfile)
