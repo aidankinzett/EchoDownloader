@@ -1,16 +1,66 @@
-<!DOCTYPE HTML>
-<html>
-    <head>
-        <title>Echo Downloader</title>
-    </head>
-    <body>
-        <h3>{{ subject_code }}</h3>
-        <ul>
-        {% for item in videos %}
-            <li><a href="{{ url_for('open_video', guid=item[4]) }}">{{ item[2] }}</a></li>
-        {% endfor %}
-        </ul>
+{% extends 'base.html' %}
 
-    </body>
+{% block subject %}
+    class = "active"
+{% endblock %}
 
-</html>
+{% block title %}
+    Echo Downloader | {{ subject_code }}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="col s12 m7">
+            <h3>{{ subject_code }}</h3>
+            <div id="videoslist">
+                <ul class="collapsible popout" data-collapsible="accordion">
+                    {% for item in videos %}
+
+                        <li>
+                            <div class="collapsible-header">
+                                <i class="material-icons" id="{{ item.guid }}-icon">
+                                {% if item.downloaded %}
+                                movie
+                                {% else %}
+                                cloud
+                                {% endif %}
+                                </i>
+                                <p class="video-title">{{ item.title }}</p>
+                                <div class="progress" style="display: none;" id="{{ item.guid }}-progress">
+                                    <div class="determinate" style="width: 0%" id="{{ item.guid }}-determinate"></div>
+                                </div>
+                                <span class="new badge"></span>
+                            </div>
+                            <div class="collapsible-body">
+                                <div class="row">
+                                    {% if item.downloaded %}
+                                        <div class="col s4">
+                                            <a href="{{ url_for('play_video', guid=item.guid) }}">Play in Browser</a>
+                                        </div>
+                                        <div class="col s4">
+                                            <a href="#!" onclick="open_video('{{ item.guid }}')">Open in Finder</a>
+                                        </div>
+                                    {% else %}
+                                        <div class="col s3">
+                                            <a href="{{ url_for('play_video', guid=item.guid) }}">Stream Low Quality</a>
+                                        </div>
+                                        <div class="col s3">
+                                            <a href="https://lecturecapture.qut.edu.au/ess/echo/presentation/{{ item.guid }}?ec=true">Stream High Quality (Gross Echo)</a>
+                                        </div>
+                                        <div class="col s3">
+                                            <a href="#" onclick="download_video('{{ item.guid }}')">Download Low Quality</a>
+                                        </div>
+                                        <div class="col s3">
+                                            <a href="#">Download High Quality</a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}

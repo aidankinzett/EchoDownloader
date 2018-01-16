@@ -1,0 +1,9 @@
+{
+  "download_directory": "static",
+  "folder_name": "Lecture Videos",
+  "high_quality": true,
+  "rss_feeds": [
+    ["MXB202", "http://lecturecapture.qut.edu.au/ess/feed?id=8f63986c-d501-4220-bab1-aaa904397e9b&type=M4V"]
+  ],
+  "sort": true
+}

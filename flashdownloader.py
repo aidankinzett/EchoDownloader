@@ -25,13 +25,13 @@ from xml.dom import minidom
 import os
 import sys
 import ffmpy
-import yaml
+import json
 
 # open the configuration file and save config as constants
-with open("config.yml", 'r') as ymlfile:
-    CONFIG = yaml.load(ymlfile)
+with open("config.json", 'r') as ymlfile:
+    CONFIG = json.load(ymlfile)
 
-DOWNLOAD_DIRECTORY = CONFIG['download directory']
+DOWNLOAD_DIRECTORY = CONFIG['download_directory']
 
 def get_swf_url(rssurl):
     """Get url for files from the url that is given by the rss feed.

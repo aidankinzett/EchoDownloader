@@ -1,0 +1,17 @@
+click==6.7
+enum34==1.1.6
+eventlet==0.22.0
+feedparser==5.2.1
+ffmpy==0.2.2
+Flask==0.12.2
+Flask-SocketIO==2.9.3
+greenlet==0.4.12
+itsdangerous==0.24
+Jinja2==2.10
+MarkupSafe==1.0
+python-engineio==2.0.2
+python-socketio==1.8.4
+PyYAML==3.12
+six==1.11.0
+SQLAlchemy==1.2.0
+Werkzeug==0.14.1
