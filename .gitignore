@@ -2,3 +2,6 @@
 /__pycache__
 .DS_Store
 config.yml
+.mkv
+.mp4
+/virtualenv
