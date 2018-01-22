@@ -67,15 +67,10 @@
                                         <div class="col s2">
                                             <a href="#!" onclick="download_video('{{ item.guid }}')" id="{{ item.guid }}-watched_unwatched">Download Low Quality</a>
                                         </div>
-<<<<<<< HEAD
                                         <div class="col s2">
                                             <a href="#!" onclick="download_hq_video('{{ item.guid }}')" id="{{ item.guid }}-watched_unwatched">Download High Quality</a>
                                         </div>
                                         <div class="col s2">
-=======
-                                        <div class="col s3">
-                                            <a href="#">Download High Quality</a>
->>>>>>> parent of 1fb1ad6... added support for downloading and watching hq videos in web frontend
                                         </div>
                                         {% if item.watched %}
                                             <div class="col s2" id="{{ item.guid }}-unwatched">

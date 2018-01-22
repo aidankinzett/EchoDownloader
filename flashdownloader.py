@@ -31,7 +31,6 @@ import json
 with open("config.json", 'r') as ymlfile:
     CONFIG = json.load(ymlfile)
 
-DOWNLOAD_DIRECTORY = CONFIG['download_directory']
 
 def get_swf_url(rssurl):
     """Get url for files from the url that is given by the rss feed.

@@ -7,13 +7,10 @@ import sys
 from threading import Lock
 from flask import request, render_template, Flask
 from flask_socketio import SocketIO, send, emit
-<<<<<<< HEAD
 from urllib.request import urlopen, URLopener
 from xml.dom import minidom
 from gevent import monkey
-=======
-
->>>>>>> parent of 1fb1ad6... added support for downloading and watching hq videos in web frontend
+import ffmpy
 from createDB import *
 
 from urllib.request import URLopener
@@ -88,9 +85,7 @@ def settings():
     for subject in subjects:
         clean_subjects.append(subject.subject_code)
 
-    return render_template('settings.html', rss_feeds=RSS_FEEDS, download_directory=DOWNLOAD_DIRECTORY,
-                           high_quality=HIGH_QUALITY,
-                           sort=SORT, video_folder_name=VIDEO_FOLDER_NAME, subjects=clean_subjects)
+    return render_template('settings.html')
 
 
 @app.route('/subject/<subject_code>')
@@ -116,11 +111,9 @@ def play_video(guid=None):
     session = createSession()
     video = session.query(Video).filter(Video.guid == guid)[0]
 
-<<<<<<< HEAD
+
     if video.downloaded == 1:
-=======
-    if video.downloaded != 0 :
->>>>>>> parent of 1fb1ad6... added support for downloading and watching hq videos in web frontend
+
         path = os.path.join(video.subject_code, "Lecture Videos", video.title + ".mp4")
     else:
         path = video.url
@@ -176,7 +169,6 @@ def emit_download(message):
 
 
 def download_video(message):
-    send('fuck this piece of fucking shit')
     socketio.sleep(0.01)
 
     guid = message
@@ -196,7 +188,6 @@ def download_video(message):
     print("Finished downloading")
     socketio.emit('downloading', 'done')
 
-<<<<<<< HEAD
     echodownloader.mark_db_downloaded(video_info, 'lq')
 
 
@@ -500,6 +491,3 @@ def high_quality_download(url, video_path):
     concat_videos(max_time, guid)
     trim_audio_file(guid)
     combine_audio_and_video(guid, video_path)
-=======
-    echodownloader.mark_db_downloaded(video_info, 'lq')
->>>>>>> parent of 1fb1ad6... added support for downloading and watching hq videos in web frontend

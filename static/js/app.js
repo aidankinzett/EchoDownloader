@@ -28,7 +28,6 @@ function download_video(guid) {
     }
 }
 
-<<<<<<< HEAD
 function download_hq_video(guid) {
     if (downloading === false) {
         console.log('downloading in hd');
@@ -43,8 +42,6 @@ function download_hq_video(guid) {
     }
 }
 
-=======
->>>>>>> parent of 1fb1ad6... added support for downloading and watching hq videos in web frontend
 function open_video(guid) {
     socket.emit('open_video', guid);
 }

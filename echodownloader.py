@@ -31,11 +31,8 @@ with open("config.json", 'r') as ymlfile:
     CONFIG = json.load(ymlfile)
 
 RSS_FEEDS = CONFIG['rss_feeds']
-DOWNLOAD_DIRECTORY = CONFIG['download_directory']
+DOWNLOAD_DIRECTORY = 'static'
 DB_PATH = os.path.join(DOWNLOAD_DIRECTORY, 'echodownloader.db')
-HIGH_QUALITY = CONFIG['high_quality']
-SORT = CONFIG['sort']
-VIDEO_FOLDER_NAME = CONFIG['folder_name']
 
 def check_database_exists():
     """If the database doesnt exists in the specified folder, create one."""
