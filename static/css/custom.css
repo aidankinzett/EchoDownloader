@@ -6,5 +6,33 @@
 .video-title {
     margin-top: 0;
     margin-bottom: 0;
-    width: 50%;
+    width: 40%;
+}
+
+.progress-words{
+    margin:0;
+}
+
+.progress .determinate{
+    background-color: #FF5722;
+}
+
+.progress{
+    background-color: #ffbba6;
+}
+
+span.badge.new{
+    background-color: #FF5722;
+}
+
+.progress-words{
+    color: #757575;
+}
+
+.collection a.collection-item{
+    color: #FF5722;
+}
+
+.dropdown-content li>a, .dropdown-content li>span {
+    color: #FF5722;
 }

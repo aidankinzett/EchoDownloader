@@ -26,33 +26,72 @@
                                 {% endif %}
                                 </i>
                                 <p class="video-title">{{ item.title }}</p>
-                                <div class="progress" style="display: none;" id="{{ item.guid }}-progress">
+                                <p class="progress-words tooltipped" id="{{ item.guid }}-words" data-position="bottom" data-delay="50" data-tooltip="I am a tooltip"></p>
+                                <div class="progress" style="display: none" id="{{ item.guid }}-progress">
                                     <div class="determinate" style="width: 0%" id="{{ item.guid }}-determinate"></div>
                                 </div>
-                                <span class="new badge"></span>
+                                <span class="new badge" id="{{ item.guid }}-newbadge"{% if item.watched == 1 %} style="visibility: hidden"{% endif %}></span>
                             </div>
                             <div class="collapsible-body">
                                 <div class="row">
                                     {% if item.downloaded %}
-                                        <div class="col s4">
+                                        <div class="col s3">
                                             <a href="{{ url_for('play_video', guid=item.guid) }}">Play in Browser</a>
                                         </div>
-                                        <div class="col s4">
+                                        <div class="col s3">
                                             <a href="#!" onclick="open_video('{{ item.guid }}')">Open in Finder</a>
                                         </div>
+                                        <div class="col s3"></div>
+                                        {% if item.watched %}
+                                            <div class="col s3" id="{{ item.guid }}-unwatched">
+                                                <a href="#!" onclick="mark_video_as_unwatched('{{ item.guid }}')">Mark as Unwatched</a>
+                                            </div>
+                                            <div class="col s3" id="{{ item.guid }}-watched" style="display: none;">
+                                                <a href="#!" onclick="mark_video_as_watched('{{ item.guid }}')">Mark as Watched</a>
+                                            </div>
+                                        {% else %}
+                                            <div class="col s3" id="{{ item.guid }}-unwatched" style="display: none;">
+                                                <a href="#!" onclick="mark_video_as_unwatched('{{ item.guid }}')">Mark as Unwatched</a>
+                                            </div>
+                                            <div class="col s3" id="{{ item.guid }}-watched">
+                                                <a href="#!" onclick="mark_video_as_watched('{{ item.guid }}')" >Mark as Watched</a>
+                                            </div>
+                                        {% endif %}
                                     {% else %}
-                                        <div class="col s3">
+                                        <div class="col s2">
                                             <a href="{{ url_for('play_video', guid=item.guid) }}">Stream Low Quality</a>
                                         </div>
-                                        <div class="col s3">
+                                        <div class="col s2">
                                             <a href="https://lecturecapture.qut.edu.au/ess/echo/presentation/{{ item.guid }}?ec=true">Stream High Quality (Gross Echo)</a>
                                         </div>
-                                        <div class="col s3">
-                                            <a href="#" onclick="download_video('{{ item.guid }}')">Download Low Quality</a>
+                                        <div class="col s2">
+                                            <a href="#!" onclick="download_video('{{ item.guid }}')" id="{{ item.guid }}-watched_unwatched">Download Low Quality</a>
                                         </div>
+<<<<<<< HEAD
+                                        <div class="col s2">
+                                            <a href="#!" onclick="download_hq_video('{{ item.guid }}')" id="{{ item.guid }}-watched_unwatched">Download High Quality</a>
+                                        </div>
+                                        <div class="col s2">
+=======
                                         <div class="col s3">
                                             <a href="#">Download High Quality</a>
+>>>>>>> parent of 1fb1ad6... added support for downloading and watching hq videos in web frontend
                                         </div>
+                                        {% if item.watched %}
+                                            <div class="col s2" id="{{ item.guid }}-unwatched">
+                                                <a href="#!" onclick="mark_video_as_unwatched('{{ item.guid }}')">Mark as Unwatched</a>
+                                            </div>
+                                            <div class="col s2" id="{{ item.guid }}-watched" style="display: none;">
+                                                <a href="#!" onclick="mark_video_as_watched('{{ item.guid }}')">Mark as Watched</a>
+                                            </div>
+                                        {% else %}
+                                            <div class="col s2" id="{{ item.guid }}-unwatched" style="display: none;">
+                                                <a href="#!" onclick="mark_video_as_unwatched('{{ item.guid }}')">Mark as Unwatched</a>
+                                            </div>
+                                            <div class="col s2" id="{{ item.guid }}-watched">
+                                                <a href="#!" onclick="mark_video_as_watched('{{ item.guid }}')" >Mark as Watched</a>
+                                            </div>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </div>
