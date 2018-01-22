@@ -4,4 +4,7 @@
 config.yml
 .mkv
 .mp4
-/virtualenv
+virtualenv
+*.db
+
+\.idea/
