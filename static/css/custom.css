@@ -36,3 +36,19 @@ span.badge.new{
 .dropdown-content li>a, .dropdown-content li>span {
     color: #FF5722;
 }
+
+.btn:hover {
+    background-color: #FF5722;
+}
+
+.btn:focus {
+    background-color: #FF5722;
+}
+
+button:focus {
+    background-color: #FF5722;
+}
+
+.switch label input[type=checkbox]:checked+.lever:after{
+     background-color: #FF5722;
+}

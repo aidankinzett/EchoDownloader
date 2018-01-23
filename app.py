@@ -41,6 +41,8 @@ thread_lock = Lock()
 
 @app.route('/')
 def home():
+    for item in RSS_FEEDS:
+        echodownloader.get_video_info(item)
     session = createSession()
 
     subjects = session.query(Video).distinct(Video.subject_code).group_by(Video.subject_code)
@@ -144,15 +146,11 @@ def open_video(guid):
     subprocess.call(["open", "-R", file_to_show])
 
 
-def testing_bullshit():
-    send("this is shit")
-
 
 @socketio.on('client_connected')
 def handle_client_connect_event(json):
     print('received json: {0}'.format(str(json)))
     send('hello client')
-    testing_bullshit()
 
 
 @socketio.on('message')
