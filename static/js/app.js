@@ -55,10 +55,11 @@ function mark_video_as_watched(guid) {
 }
 
 function mark_video_as_unwatched(guid) {
-    socket.emit('mark_unwatched', guid);
+    socket.emit('mark_watched', guid);
     document.getElementById(guid + "-newbadge").style.visibility = "visible";
     document.getElementById(guid + "-watched").style.display = "inline";
     document.getElementById(guid + "-unwatched").style.display = "none";
+
 }
 
 socket.on('downloading', function (data) {
@@ -94,3 +95,6 @@ socket.on('downloading_hq', function (data) {
     }
 });
 
+$(document).ready(function () {
+    $(".button-collapse").sideNav();
+});

@@ -17,13 +17,13 @@ if (typeof jQuery === 'undefined') {
     jQuery = $;
   }
 }
-/*
- * jQuery Easing v1.4.0 - http://gsgd.co.uk/sandbox/jquery/easing/
- * Open source under the BSD License.
- * Copyright © 2008 George McGinley Smith
- * All rights reserved.
- * https://raw.github.com/gdsmith/jquery-easing/master/LICENSE
- */
+; /*
+  * jQuery Easing v1.4.0 - http://gsgd.co.uk/sandbox/jquery/easing/
+  * Open source under the BSD License.
+  * Copyright © 2008 George McGinley Smith
+  * All rights reserved.
+  * https://raw.github.com/gdsmith/jquery-easing/master/LICENSE
+  */
 
 (function (factory) {
   if (typeof define === "function" && define.amd) {
@@ -160,14 +160,13 @@ if (typeof jQuery === 'undefined') {
       return x < 0.5 ? (1 - bounceOut(1 - 2 * x)) / 2 : (1 + bounceOut(2 * x - 1)) / 2;
     }
   });
-}); // Custom Easing
+});; // Custom Easing
 jQuery.extend(jQuery.easing, {
   easeInOutMaterial: function (x, t, b, c, d) {
     if ((t /= d / 2) < 1) return c / 2 * t * t + b;
     return c / 4 * ((t -= 2) * t * t + 2) + b;
   }
-});
-/*! VelocityJS.org (1.2.3). (C) 2014 Julian Shapiro. MIT @license: en.wikipedia.org/wiki/MIT_License */
+});; /*! VelocityJS.org (1.2.3). (C) 2014 Julian Shapiro. MIT @license: en.wikipedia.org/wiki/MIT_License */
 /*! VelocityJS.org jQuery Shim (1.0.1). (C) 2014 The jQuery Foundation. MIT @license: en.wikipedia.org/wiki/MIT_License. */
 /*! Note that this has been modified by Materialize to confirm that Velocity is not already being imported. */
 jQuery.Velocity ? console.log("Velocity is already loaded. You may be needlessly importing Velocity again; note that Materialize includes Velocity.") : (!function (e) {
@@ -793,8 +792,8 @@ jQuery.Velocity ? console.log("Velocity is already loaded. You may be needlessly
     }), b;
   }(window.jQuery || window.Zepto || window, window, document);
 }));
-!function (a, b, c, d) {
-    "use strict";
+;!function (a, b, c, d) {
+  "use strict";
   function k(a, b, c) {
     return setTimeout(q(a, c), b);
   }function l(a, b, c) {
@@ -1216,9 +1215,8 @@ jQuery.Velocity ? console.log("Velocity is already loaded. You may be needlessly
     } }, n(hc, { INPUT_START: O, INPUT_MOVE: P, INPUT_END: Q, INPUT_CANCEL: R, STATE_POSSIBLE: Rb, STATE_BEGAN: Sb, STATE_CHANGED: Tb, STATE_ENDED: Ub, STATE_RECOGNIZED: Vb, STATE_CANCELLED: Wb, STATE_FAILED: Xb, DIRECTION_NONE: S, DIRECTION_LEFT: T, DIRECTION_RIGHT: U, DIRECTION_UP: V, DIRECTION_DOWN: W, DIRECTION_HORIZONTAL: X, DIRECTION_VERTICAL: Y, DIRECTION_ALL: Z, Manager: kc, Input: ab, TouchAction: Pb, TouchInput: Eb, MouseInput: rb, PointerEventInput: wb, TouchMouseInput: Gb, SingleTouchInput: Ab, Recognizer: Yb, AttrRecognizer: ac, Tap: gc, Pan: bc, Swipe: fc, Pinch: cc, Rotate: ec, Press: dc, on: t, off: u, each: m, merge: o, extend: n, inherit: p, bindFn: q, prefixed: B }), typeof define == g && define.amd ? define(function () {
     return hc;
   }) : "undefined" != typeof module && module.exports ? module.exports = hc : a[c] = hc;
-}(window, document, "Hammer");
-(function (factory) {
-    if (typeof define === 'function' && define.amd) {
+}(window, document, "Hammer");;(function (factory) {
+  if (typeof define === 'function' && define.amd) {
     define(['jquery', 'hammerjs'], factory);
   } else if (typeof exports === 'object') {
     factory(require('jquery'), require('hammerjs'));
@@ -1250,7 +1248,7 @@ jQuery.Velocity ? console.log("Velocity is already loaded. You may be needlessly
     };
   }(Hammer.Manager.prototype.emit);
 });
- // Required for Meteor package, the use of window prevents export by Meteor
+; // Required for Meteor package, the use of window prevents export by Meteor
 (function (window) {
   if (window.Package) {
     Materialize = {};
@@ -1420,8 +1418,8 @@ if (Vel) {
 } else {
   Materialize.Vel = Velocity;
 }
-(function ($) {
-    $.fn.collapsible = function (options, methodParam) {
+;(function ($) {
+  $.fn.collapsible = function (options, methodParam) {
     var defaults = {
       accordion: undefined,
       onOpen: undefined,
@@ -1597,10 +1595,9 @@ if (Vel) {
   $(document).ready(function () {
     $('.collapsible').collapsible();
   });
-})(jQuery);
-(function ($) {
+})(jQuery);;(function ($) {
 
-    // Add posibility to scroll to selected option
+  // Add posibility to scroll to selected option
   // usefull for select for example
   $.fn.scrollTo = function (elem) {
     $(this).scrollTop($(this).scrollTop() - $(this).offset().top + $(elem).offset().top);
@@ -1855,8 +1852,8 @@ if (Vel) {
     $('.dropdown-button').dropdown();
   });
 })(jQuery);
-(function ($, Vel) {
-    'use strict';
+;(function ($, Vel) {
+  'use strict';
 
   var _defaults = {
     opacity: 0.5,
@@ -2248,8 +2245,9 @@ if (Vel) {
     }
   };
 })(jQuery, Materialize.Vel);
-(function ($) {
-    $.fn.materialbox = function () {
+;(function ($) {
+
+  $.fn.materialbox = function () {
 
     return this.each(function () {
 
@@ -2510,8 +2508,9 @@ if (Vel) {
     $('.materialboxed').materialbox();
   });
 })(jQuery);
-(function ($) {
-    $.fn.parallax = function () {
+;(function ($) {
+
+  $.fn.parallax = function () {
     var window_width = $(window).width();
     // Parallax Scripts
     return this.each(function (i) {
@@ -2563,8 +2562,9 @@ if (Vel) {
     });
   };
 })(jQuery);
-(function ($) {
-    var methods = {
+;(function ($) {
+
+  var methods = {
     init: function (options) {
       var defaults = {
         onShow: null,
@@ -2806,8 +2806,8 @@ if (Vel) {
     $('ul.tabs').tabs();
   });
 })(jQuery);
-(function ($) {
-    $.fn.tooltip = function (options) {
+;(function ($) {
+  $.fn.tooltip = function (options) {
     var timeout = null,
         margin = 5;
 
@@ -3033,17 +3033,17 @@ if (Vel) {
     $('.tooltipped').tooltip();
   });
 })(jQuery);
-/*!
- * Waves v0.6.4
- * http://fian.my.id/Waves
- *
- * Copyright 2014 Alfiana E. Sibuea and other contributors
- * Released under the MIT license
- * https://github.com/fians/Waves/blob/master/LICENSE
- */
+; /*!
+  * Waves v0.6.4
+  * http://fian.my.id/Waves
+  *
+  * Copyright 2014 Alfiana E. Sibuea and other contributors
+  * Released under the MIT license
+  * https://github.com/fians/Waves/blob/master/LICENSE
+  */
 
-(function (window) {
-    'use strict';
+;(function (window) {
+  'use strict';
 
   var Waves = Waves || {};
   var $$ = document.querySelectorAll.bind(document);
@@ -3366,8 +3366,8 @@ if (Vel) {
     Waves.displayEffect();
   }, false);
 })(window);
-(function ($, Vel) {
-    'use strict';
+;(function ($, Vel) {
+  'use strict';
 
   var _defaults = {
     displayLength: Infinity,
@@ -3716,8 +3716,9 @@ if (Vel) {
     return new Toast(message, displayLength, className, completeCallback);
   };
 })(jQuery, Materialize.Vel);
-(function ($) {
-    var methods = {
+;(function ($) {
+
+  var methods = {
     init: function (options) {
       var defaults = {
         menuWidth: 300,
@@ -4110,8 +4111,8 @@ if (Vel) {
     }
   }; // Plugin end
 })(jQuery);
-/**
- * Extend jquery with a scrollspy plugin.
+; /**
+  * Extend jquery with a scrollspy plugin.
   * This watches the window scroll and fires events when elements are scrolled into viewport.
   *
   * throttle() and getTime() taken from Underscore.js
@@ -4340,8 +4341,8 @@ if (Vel) {
     return $.scrollSpy($(this), options);
   };
 })(jQuery);
-(function ($) {
-    $(document).ready(function () {
+;(function ($) {
+  $(document).ready(function () {
 
     // Function to update labels of text fields
     Materialize.updateTextFields = function () {
@@ -4446,7 +4447,7 @@ if (Vel) {
 
           $(this).removeClass('tabbed');
         });
-
+        return;
       }
     });
 
@@ -5146,8 +5147,9 @@ if (Vel) {
     }
   };
 })(jQuery);
-(function ($) {
-    var methods = {
+;(function ($) {
+
+  var methods = {
 
     init: function (options) {
       var defaults = {
@@ -5440,8 +5442,8 @@ if (Vel) {
     }
   }; // Plugin end
 })(jQuery);
-(function ($) {
-    $(document).ready(function () {
+;(function ($) {
+  $(document).ready(function () {
 
     $(document).on('click.card', '.card', function (e) {
       if ($(this).find('> .card-reveal').length) {
@@ -5468,8 +5470,8 @@ if (Vel) {
     });
   });
 })(jQuery);
-(function ($) {
-    var materialChipsDefaults = {
+;(function ($) {
+  var materialChipsDefaults = {
     data: [],
     placeholder: '',
     secondaryPlaceholder: '',
@@ -5648,7 +5650,7 @@ if (Vel) {
           e.preventDefault();
           self.selectChip(chipsLength - 1, $chips);
           $target.blur();
-
+          return;
         }
       });
 
@@ -5783,8 +5785,8 @@ if (Vel) {
     this.handleEvents();
   };
 })(jQuery);
-(function ($) {
-    $.fn.pushpin = function (options) {
+;(function ($) {
+  $.fn.pushpin = function (options) {
     // Defaults
     var defaults = {
       top: 0,
@@ -5850,9 +5852,8 @@ if (Vel) {
       });
     });
   };
-})(jQuery);
-(function ($) {
-    $(document).ready(function () {
+})(jQuery);;(function ($) {
+  $(document).ready(function () {
 
     // jQuery reverse
     $.fn.reverse = [].reverse;
@@ -6104,8 +6105,8 @@ if (Vel) {
     }, 200);
   };
 })(jQuery);
-(function ($) {
-    // Image transition function
+;(function ($) {
+  // Image transition function
   Materialize.fadeInImage = function (selectorOrEl) {
     var element;
     if (typeof selectorOrEl === 'string') {
@@ -6267,8 +6268,9 @@ if (Vel) {
     // });
   });
 })(jQuery);
-(function ($) {
-    var scrollFireEventsHandled = false;
+;(function ($) {
+
+  var scrollFireEventsHandled = false;
 
   // Input: Array of JSON objects {selector, offset, callback}
   Materialize.scrollFire = function (options) {
@@ -6315,12 +6317,12 @@ if (Vel) {
     setTimeout(throttledScroll, 0);
   };
 })(jQuery);
-/*!
- * pickadate.js v3.5.0, 2014/04/13
- * By Amsul, http://amsul.ca
- * Hosted on http://amsul.github.io/pickadate.js
- * Licensed under MIT
- */
+; /*!
+  * pickadate.js v3.5.0, 2014/04/13
+  * By Amsul, http://amsul.ca
+  * Hosted on http://amsul.github.io/pickadate.js
+  * Licensed under MIT
+  */
 
 (function (factory) {
 
@@ -7349,10 +7351,10 @@ if (Vel) {
   // Expose the picker constructor.
   return PickerConstructor;
 });
-/*!
- * Date picker for pickadate.js v3.5.0
- * http://amsul.github.io/pickadate.js/date.htm
- */
+; /*!
+  * Date picker for pickadate.js v3.5.0
+  * http://amsul.github.io/pickadate.js/date.htm
+  */
 
 (function (factory) {
   factory(Materialize.Picker, jQuery);
@@ -8580,14 +8582,14 @@ if (Vel) {
    */
   Picker.extend('pickadate', DatePicker);
 });
-/*!
- * ClockPicker v0.0.7 (http://weareoutman.github.io/clockpicker/)
- * Copyright 2014 Wang Shenwei.
- * Licensed under MIT (https://github.com/weareoutman/clockpicker/blob/gh-pages/LICENSE)
- *
- * Further modified
- * Copyright 2015 Ching Yaw Hao.
- */
+; /*!
+  * ClockPicker v0.0.7 (http://weareoutman.github.io/clockpicker/)
+  * Copyright 2014 Wang Shenwei.
+  * Licensed under MIT (https://github.com/weareoutman/clockpicker/blob/gh-pages/LICENSE)
+  *
+  * Further modified
+  * Copyright 2015 Ching Yaw Hao.
+  */
 
 (function ($) {
   var $win = $(window),
@@ -9226,8 +9228,9 @@ if (Vel) {
     });
   };
 })(jQuery);
-(function ($) {
-    $.fn.characterCounter = function () {
+;(function ($) {
+
+  $.fn.characterCounter = function () {
     return this.each(function () {
       var $input = $(this);
       var $counterElement = $input.parent().find('span[class="character-counter"]');
@@ -9289,8 +9292,9 @@ if (Vel) {
     $('input, textarea').characterCounter();
   });
 })(jQuery);
-(function ($) {
-    var methods = {
+;(function ($) {
+
+  var methods = {
 
     init: function (options) {
       var defaults = {
@@ -9831,8 +9835,9 @@ if (Vel) {
     }
   }; // Plugin end
 })(jQuery);
-(function ($) {
-    var methods = {
+;(function ($) {
+
+  var methods = {
     init: function (options) {
       return this.each(function () {
         var origin = $('#' + $(this).attr('data-activates'));
