@@ -9,7 +9,7 @@ import os
 with open("config.json", 'r') as ymlfile:
     CONFIG = yaml.load(ymlfile)
 
-DOWNLOAD_DIRECTORY = 'static'
+DOWNLOAD_DIRECTORY = os.path.join('static','videos')
 DB_PATH = os.path.join(DOWNLOAD_DIRECTORY, 'echodownloader.db')
 
 Base = declarative_base()
