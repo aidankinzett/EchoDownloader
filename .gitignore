@@ -8,3 +8,5 @@ virtualenv
 *.db
 
 \.idea/
+venv
+static/videos

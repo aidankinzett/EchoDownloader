@@ -31,7 +31,7 @@ with open("config.json", 'r') as ymlfile:
     CONFIG = json.load(ymlfile)
 
 RSS_FEEDS = CONFIG['rss_feeds']
-DOWNLOAD_DIRECTORY = 'static'
+DOWNLOAD_DIRECTORY = os.path.join('static','videos')
 DB_PATH = os.path.join(DOWNLOAD_DIRECTORY, 'echodownloader.db')
 VIDEO_FOLDER_NAME = "Lecture Videos"
 
