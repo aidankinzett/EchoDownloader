@@ -56,3 +56,7 @@ button:focus {
 .btn, .btn-large {
     background-color: #FF5722;
 }
+
+.switch label input[type=checkbox]:checked+.lever {
+    background-color: #ff8a50;
+}
