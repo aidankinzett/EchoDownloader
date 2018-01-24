@@ -1,5 +1,1 @@
-{
-  "rss_feeds": [
-    ["MXB202", "http://lecturecapture.qut.edu.au/ess/feed?id=8f63986c-d501-4220-bab1-aaa904397e9b&type=M4V"]
-  ]
-}
+{"rss_feeds": [["MXB202", "http://lecturecapture.qut.edu.au/ess/feed?id=8f63986c-d501-4220-bab1-aaa904397e9b&type=M4V"], ["TEST101", "http://lecturecapture.qut.edu.au/ess/feed?id=7e1bce3d-b6a5-4f98-a5e0-fd89959061d3&type=M4V"]]}

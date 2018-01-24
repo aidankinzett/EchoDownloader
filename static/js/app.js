@@ -96,20 +96,24 @@ socket.on('downloading_hq', function (data) {
 });
 
 function add_settings_row() {
-    document.getElementById('rows').innerHTML += '<div class="row">\n' +
+    rss_form_number += 1
+    document.getElementById('rows').innerHTML += '<div class="row" id="row_'+rss_form_number+'">\n' +
         '                        <div class="input-field col s3">\n' +
-        '                            <input type="text" placeholder="Subject Code">\n' +
+        '                            <input type="text" placeholder="Subject Code" name="code_'+rss_form_number+'">\n' +
         '                        </div>\n' +
         '                        <div class="input-field col s8">\n' +
-        '                            <input type="text" placeholder="RSS URL">\n' +
+        '                            <input type="text" placeholder="RSS URL" name="rss_'+rss_form_number+'">\n' +
         '                        </div>\n' +
         '                        <div class="delete col s1">\n' +
-        '                            <a class="waves-effect waves-light btn" >-</a>\n' +
+        '                            <a class="waves-effect waves-light btn" onclick="delete_settings_row('+rss_form_number+')">-</a>\n' +
         '                        </div>\n' +
         '                    </div>'
 }
 
 
+function delete_settings_row(row_number) {
+    document.getElementById('row_'+row_number).remove();
+}
 
 $(document).ready(function () {
     $(".button-collapse").sideNav();

@@ -1,19 +1,19 @@
+import eventlet
+import ffmpy
+import json
 import sqlite3
 import subprocess
-import echodownloader
-import json
-import eventlet
 import sys
-from threading import Lock
 from flask import request, render_template, Flask
 from flask_socketio import SocketIO, send, emit
+from gevent import monkey
+from threading import Lock
+from urllib.request import URLopener
 from urllib.request import urlopen, URLopener
 from xml.dom import minidom
-from gevent import monkey
-import ffmpy
-from createDB import *
 
-from urllib.request import URLopener
+import echodownloader
+from createDB import *
 
 monkey.patch_all()
 
@@ -22,8 +22,7 @@ with open("config.json", 'r') as ymlfile:
     CONFIG = json.load(ymlfile)
 RSS_FEEDS = CONFIG['rss_feeds']
 
-
-DOWNLOAD_DIRECTORY = os.path.join("static","videos")
+DOWNLOAD_DIRECTORY = os.path.join("static", "videos")
 DB_PATH = os.path.join(DOWNLOAD_DIRECTORY, 'echodownloader.db')
 VIDEO_FOLDER_NAME = "Lecture Videos"
 
@@ -57,15 +56,21 @@ def home():
 @app.route('/settings', methods=['POST', 'GET'])
 def settings():
     if request.method == 'POST':
-        print(request.form)
+        rss_feeds=[]
 
-    feeds = []
-    for n in range(0,len(request.form)):
-        feeds.append()
+        for key, value in request.form.items():
+            rss_feeds += [value]
 
+        rss_feeds_sliced = [rss_feeds[i:i+2] for i in range(0, len(rss_feeds), 2)]
 
-    # with open("config.json", 'r') as ymlfile:
-    #     CONFIG = json.load(ymlfile)
+        print(rss_feeds_sliced)
+
+        data = {"rss_feeds":rss_feeds_sliced}
+        with open('config.json', 'w') as outfile:
+            json.dump(data, outfile)
+
+    with open("config.json", 'r') as ymlfile:
+        CONFIG = json.load(ymlfile)
 
     RSS_FEEDS = CONFIG['rss_feeds']
     session = createSession()
@@ -75,7 +80,7 @@ def settings():
     for subject in subjects:
         clean_subjects.append(subject.subject_code)
 
-    return render_template('settings.html', rss_feeds=RSS_FEEDS)
+    return render_template('settings.html', rss_feeds=RSS_FEEDS, subjects=clean_subjects)
 
 
 @app.route('/subject/<subject_code>')
@@ -100,7 +105,6 @@ def display_subject(subject_code=None):
 def play_video(guid=None):
     session = createSession()
     video = session.query(Video).filter(Video.guid == guid)[0]
-
 
     if video.downloaded == 1:
 
@@ -132,7 +136,6 @@ def open_video(guid):
         file_to_show = os.path.join(DOWNLOAD_DIRECTORY, video.subject_code, "Lecture Videos", video.title + ".mkv")
 
     subprocess.call(["open", "-R", file_to_show])
-
 
 
 @socketio.on('client_connected')

@@ -9,6 +9,7 @@
 {% endblock %}
 
 {% block content %}
+<script>var rss_form_number = 0;</script>
     <div class="container">
         <div class="col s12 m7">
             <h3>Settings</h3>
@@ -17,19 +18,18 @@
             <form action="{{ url_for('settings') }}" method="POST">
                 <div id="rows">
                     {% for feed in rss_feeds %}
-                        {% set i = 1 %}
-                        <div class="row">
+                        <div class="row" id="row_{{loop.index}}">
                             <div class="input-field col s3">
-                                <input type="text" placeholder="Subject Code" value="{{ feed[0] }}" name="code_{{ i }}">
+                                <input type="text" placeholder="Subject Code" value="{{ feed[0] }}" name="code_{{ loop.index }}" id="code_{{ loop.index }}">
                             </div>
                             <div class="input-field col s8">
-                                <input type="text" placeholder="RSS URL" value="{{ feed[1] }}" name="rss_{{ i }}">
+                                <input type="text" placeholder="RSS URL" value="{{ feed[1] }}" name='rss_{{ loop.index }}' id='rss_{{ loop.index }}'>
                             </div>
                             <div class="delete col s1">
-                                <a class="waves-effect waves-light btn">-</a>
+                                <a class="waves-effect waves-light btn" id="delete_{{ loop.index }}" onclick="delete_settings_row({{loop.index}})">-</a>
                             </div>
                         </div>
-                        {% set i = i + 1 %}
+                    <script>rss_form_number++</script>
                     {% endfor %}
                 </div>
                 <button class="btn waves-effect waves-light" type="submit">Submit
@@ -38,5 +38,7 @@
             </form>
         </div>
     </div>
+
+
 
 {% endblock %}
