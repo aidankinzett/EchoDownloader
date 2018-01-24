@@ -10,3 +10,4 @@ virtualenv
 \.idea/
 venv
 static/videos
+run.bat
