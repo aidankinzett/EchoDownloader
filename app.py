@@ -116,6 +116,10 @@ def play_video(guid=None):
 
     return render_template('video_player.html', video=video, path=path)
 
+@app.route('/downloads')
+def downloads():
+    return render_template('downloads.html')
+
 
 def download_progress_bar(count, block_size, total_size):
     """To provide a progress bar to show when downloading LQ videos."""

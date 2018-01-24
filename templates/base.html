@@ -31,6 +31,7 @@
                         Subjects<i class="material-icons right">arrow_drop_down</i>
                     </a>
                 </li>
+                <li{% block downloads %}{% endblock %}><a href="{{ url_for('downloads')}}">Downloads</a></li>
             </ul>
         </div>
         <ul id="dropdown1" class="dropdown-content">
@@ -48,6 +49,10 @@
             {% for subject in subjects %}
                 <li><a href="{{ url_for('display_subject', subject_code=subject) }}">{{ subject }}</a></li>
             {% endfor %}
+            <li>
+                <div class="divider"></div>
+            </li>
+            <li><a href="{{ url_for('downloads')}}">Downloads</a></li>
         </ul>
     </div>
 </nav>
