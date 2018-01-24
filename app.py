@@ -40,21 +40,26 @@ thread_lock = Lock()
 
 @app.route('/')
 def home():
+    with open("config.json", 'r') as ymlfile:
+        CONFIG = json.load(ymlfile)
+    RSS_FEEDS = CONFIG['rss_feeds']
+
     for item in RSS_FEEDS:
         echodownloader.get_video_info(item)
-    session = createSession()
-
-    subjects = session.query(Video).distinct(Video.subject_code).group_by(Video.subject_code)
 
     clean_subjects = []
-    for subject in subjects:
-        clean_subjects.append(subject.subject_code)
+    for item in RSS_FEEDS:
+        clean_subjects.append(item[0])
 
     return render_template('home.html', subjects=clean_subjects)
 
 
 @app.route('/settings', methods=['POST', 'GET'])
 def settings():
+    with open("config.json", 'r') as ymlfile:
+        CONFIG = json.load(ymlfile)
+    RSS_FEEDS = CONFIG['rss_feeds']
+
     if request.method == 'POST':
         print(request.form)
         rss_feeds=[]
@@ -70,22 +75,19 @@ def settings():
         with open('config.json', 'w') as outfile:
             json.dump(data, outfile)
 
-    with open("config.json", 'r') as ymlfile:
-        CONFIG = json.load(ymlfile)
-
-    RSS_FEEDS = CONFIG['rss_feeds']
-    session = createSession()
-    subjects = session.query(Video).distinct(Video.subject_code).group_by(Video.subject_code)
-
     clean_subjects = []
-    for subject in subjects:
-        clean_subjects.append(subject.subject_code)
+    for item in RSS_FEEDS:
+        clean_subjects.append(item[0])
 
     return render_template('settings.html', rss_feeds=RSS_FEEDS, subjects=clean_subjects)
 
 
 @app.route('/subject/<subject_code>')
 def display_subject(subject_code=None):
+    with open("config.json", 'r') as ymlfile:
+        CONFIG = json.load(ymlfile)
+    RSS_FEEDS = CONFIG['rss_feeds']
+
     for item in RSS_FEEDS:
         if item[0] == subject_code:
             echodownloader.get_video_info(item)
@@ -93,17 +95,20 @@ def display_subject(subject_code=None):
 
     videos = session.query(Video).filter(Video.subject_code == subject_code)
 
-    subjects = session.query(Video).distinct(Video.subject_code).group_by(Video.subject_code)
 
     clean_subjects = []
-    for subject in subjects:
-        clean_subjects.append(subject.subject_code)
+    for item in RSS_FEEDS:
+        clean_subjects.append(item[0])
 
     return render_template('subject.html', videos=videos, subject_code=subject_code, subjects=clean_subjects)
 
 
 @app.route('/video?=<guid>')
 def play_video(guid=None):
+    with open("config.json", 'r') as ymlfile:
+        CONFIG = json.load(ymlfile)
+    RSS_FEEDS = CONFIG['rss_feeds']
+
     session = createSession()
     video = session.query(Video).filter(Video.guid == guid)[0]
 
@@ -115,18 +120,21 @@ def play_video(guid=None):
 
     print(path)
 
-    return render_template('video_player.html', video=video, path=path)
+    clean_subjects = []
+    for item in RSS_FEEDS:
+        clean_subjects.append(item[0])
+    return render_template('video_player.html', video=video, path=path, subjects=clean_subjects)
 
 @app.route('/downloads')
 def downloads():
-    session = createSession()
-    subjects = session.query(Video).distinct(Video.subject_code).group_by(Video.subject_code)
+    with open("config.json", 'r') as ymlfile:
+        CONFIG = json.load(ymlfile)
+    RSS_FEEDS = CONFIG['rss_feeds']
 
     clean_subjects = []
-    for subject in subjects:
-        clean_subjects.append(subject.subject_code)
-    return render_template('downloads.html')
-
+    for item in RSS_FEEDS:
+        clean_subjects.append(item[0])
+    return render_template('downloads.html', subjects=clean_subjects)
 
 def download_progress_bar(count, block_size, total_size):
     """To provide a progress bar to show when downloading LQ videos."""

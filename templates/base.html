@@ -25,13 +25,13 @@
             <a href="#!" class="brand-logo"><i class="material-icons">cloud_download</i>Echo Downloader</a>
             <ul class="right hide-on-med-and-down">
                 <li{% block home %}{% endblock %}><a href="{{ url_for('home') }}">Home</a></li>
-                <li{% block settings %}{% endblock %}><a href="{{ url_for('settings') }}">Settings</a></li>
                 <li{% block subjects %}{% endblock %}>
                     <a class="dropdown-button" href="#!" data-activates="dropdown1" data-beloworigin="true">
                         Subjects<i class="material-icons right">arrow_drop_down</i>
                     </a>
                 </li>
                 <li{% block downloads %}{% endblock %}><a href="{{ url_for('downloads')}}">Downloads</a></li>
+                <li{% block settings %}{% endblock %}><a href="{{ url_for('settings') }}">Settings</a></li>
             </ul>
         </div>
         <ul id="dropdown1" class="dropdown-content">
@@ -41,7 +41,6 @@
         </ul>
         <ul class="side-nav" id="mobile-demo">
             <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('settings') }}">Settings</a></li>
             <li>
                 <div class="divider"></div>
             </li>
@@ -53,6 +52,7 @@
                 <div class="divider"></div>
             </li>
             <li><a href="{{ url_for('downloads')}}">Downloads</a></li>
+            <li><a href="{{ url_for('settings') }}">Settings</a></li>
         </ul>
     </div>
 </nav>
