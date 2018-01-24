@@ -41,6 +41,8 @@ thread_lock = Lock()
 downloading_guid = ""
 downloading_subject = ""
 downloading_title = ""
+downloading_bool = False
+download_queue = []
 
 @app.route('/')
 def home():
@@ -177,44 +179,58 @@ def handle_message(message):
 
 @socketio.on('download')
 def emit_download(message):
-    global thread
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(target=download_video(message))
+    global thread, downloading_bool, download_queue
+    download_queue.append(message)
+    if not downloading_bool:
+        with thread_lock:
+            if thread is None:
+                thread = socketio.start_background_task(target=download_video(message))
+        downloading_bool = True
+
+
 
 
 def download_video(message):
-    global downloading_guid, downloading_title, downloading_subject
-    socketio.sleep(0.01)
+    global downloading_guid, downloading_title, downloading_subject, downloading_bool
+    for message in download_queue:
+        print(message)
+        download_queue.remove(message)
+        socketio.sleep(0.01)
 
-    guid = message
+        guid = message
 
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
 
-    cursor.execute("SELECT * FROM videos WHERE guid = ?", [guid])
-    video_info = cursor.fetchall()[0]
+        cursor.execute("SELECT * FROM videos WHERE guid = ?", [guid])
+        video_info = cursor.fetchall()[0]
 
-    video_path = echodownloader.get_video_path(video_info, '.mp4')
-    # log the video to be downloaded
-    print("Downloading {} from subject {}".format(video_info[2], video_info[1]))
-    downloading_guid = video_info[4]
-    downloading_subject = video_info[1]
-    downloading_title = video_info[2]
-    # download video
-    URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
-    print("Finished downloading")
-    socketio.emit('downloading', 'done')
+        conn.commit()
+        conn.close()
 
-    echodownloader.mark_db_downloaded(video_info, 'lq')
+        video_path = echodownloader.get_video_path(video_info, '.mp4')
+        # log the video to be downloaded
+        print("Downloading {} from subject {}".format(video_info[2], video_info[1]))
+        downloading_guid = video_info[4]
+        downloading_subject = video_info[1]
+        downloading_title = video_info[2]
+        # download video
+        URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
+        print("Finished downloading")
+        socketio.emit('downloading', 'done')
+
+        echodownloader.mark_db_downloaded(video_info, 'lq')
+
+    downloading_bool = False
 
 
 @socketio.on('download_hq')
 def emit_download_high_quality(message):
-    global thread
+    global thread, downloading_bool
     with thread_lock:
         if thread is None:
             thread = socketio.start_background_task(target=download_high_quality(message))
+    downloading_bool = True
 
 
 @socketio.on('mark_watched')
@@ -234,7 +250,7 @@ def mark_video_as_unwatched(message):
 
 
 def download_high_quality(message):
-    global thread
+    global thread, downloading_bool
     socketio.sleep(0.01)
     guid = message
 
@@ -249,6 +265,7 @@ def download_high_quality(message):
     high_quality_download(video_info[0], video_path, video_info[1], video_info[2])
 
     echodownloader.mark_db_downloaded(video_info, 'hq')
+    downloading_bool = False
 
 
 def get_swf_url(rssurl):

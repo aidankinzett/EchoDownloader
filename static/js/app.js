@@ -17,15 +17,12 @@ var downloading = false;
 var downloading_guid;
 
 function download_video(guid) {
-    if (downloading === false) {
-        socket.emit('download', guid);
-        downloading_guid = guid;
-        downloading = true;
-        document.getElementById(guid + "-progress").style.display = "inline";
-        Materialize.toast('Downloading ' + guid, 4000);
-    } else {
-        Materialize.toast('Something is already downloading, please wait until complete', 4000);
-    }
+    socket.emit('download', guid);
+    downloading_guid = guid;
+    downloading = true;
+    document.getElementById(guid + "-progress").style.display = "inline";
+    Materialize.toast('Downloading ' + guid, 4000);
+
 }
 
 function download_hq_video(guid) {
