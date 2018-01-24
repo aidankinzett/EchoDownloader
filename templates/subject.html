@@ -11,7 +11,6 @@
 {% block content %}
     <div class="container">
         <div class="col s12 m7">
-            <h3 id="subject-code">{{ subject_code }}</h3><a class="waves-effect waves-light btn modal-trigger" href="#modal1">Settings</a>
             <h4>Lectures</h4>
             <div id="videoslist">
                 <ul class="collapsible popout" data-collapsible="accordion">
@@ -109,36 +108,6 @@
                     {% endfor %}
                 </ul>
             </div>
-        </div>
-    </div>
-
-    <!-- Modal Thingo -->
-    <div id="modal1" class="modal">
-        <div class="modal-content">
-            <h5>Settings</h5>
-            <form>
-                <div class="switch">
-                    <span>Download New Lectures Automatically:   </span>
-                    <label>
-                        Off
-                        <input type="checkbox" id="auto_download">
-                        <span class="lever"></span>
-                        On
-                    </label>
-                </div>
-                <div class="switch">
-                    <span>Download in High Quality:   </span>
-                    <label>
-                        Off
-                        <input type="checkbox" id="high_quality">
-                        <span class="lever"></span>
-                        On
-                    </label>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Submit</a>
         </div>
     </div>
 {% endblock %}

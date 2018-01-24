@@ -97,22 +97,58 @@ socket.on('downloading_hq', function (data) {
 
 function add_settings_row() {
     rss_form_number += 1
-    document.getElementById('rows').innerHTML += '<div class="row" id="row_'+rss_form_number+'">\n' +
-        '                        <div class="input-field col s3">\n' +
-        '                            <input type="text" placeholder="Subject Code" name="code_'+rss_form_number+'">\n' +
+    document.getElementById('rows').innerHTML += '<div class="row" id="row_' + rss_form_number + '">\n' +
+        '                        <div class="input-field col s2">\n' +
+        '                            <input type="text" placeholder="Subject Code" name="code_' + rss_form_number + '">\n' +
         '                        </div>\n' +
-        '                        <div class="input-field col s8">\n' +
-        '                            <input type="text" placeholder="RSS URL" name="rss_'+rss_form_number+'">\n' +
+        '                        <div class="input-field col s5">\n' +
+        '                            <input type="text" placeholder="RSS URL" name="rss_' + rss_form_number + '">\n' +
         '                        </div>\n' +
+        "                    <div class=\"col s2\">\n" +
+        "                        <p>\n" +
+        "                            <input type=\"checkbox\" id=\"auto_" + rss_form_number + "\" onchange=\"activate_settings_checkbox(this, " + rss_form_number + ")\"/>\n" +
+        "                            <label for=\"auto_" + rss_form_number + "\">Auto Download</label>\n" +
+        "                        </p>\n" +
+        "                    </div>\n" +
+        "                    <div class=\"col s2\">\n" +
+        "                        <p>\n" +
+        "                            <input type=\"checkbox\" id=\"hq_" + rss_form_number + "\" disabled=\"disabled\" onchange=\"activate_text_hq(this, " + rss_form_number + ")\" />\n" +
+        "                            <label for=\"hq_" + rss_form_number + "\">High Quality</label>\n" +
+        "                        </p>\n" +
+        "                   <div style=\"display: none;\">\n" +
+        "                        <input id=\"text_auto_" + rss_form_number + "\" name=\"auto_" + rss_form_number + "\" value=\"off\">\n" +
+        "                        <input id=\"text_hq_" + rss_form_number + "\" name=\"hq_" + rss_form_number + "\" value=\"off\">\n" +
+        "                    </div>" +
+        "                    </div>\n" +
         '                        <div class="delete col s1">\n' +
-        '                            <a class="waves-effect waves-light btn" onclick="delete_settings_row('+rss_form_number+')">-</a>\n' +
+        '                            <a class="waves-effect waves-light btn" onclick="delete_settings_row(' + rss_form_number + ')">-</a>\n' +
         '                        </div>\n' +
         '                    </div>'
 }
 
 
 function delete_settings_row(row_number) {
-    document.getElementById('row_'+row_number).remove();
+    document.getElementById('row_' + row_number).remove();
+}
+
+function activate_settings_checkbox(checkboxElem, number) {
+    if (checkboxElem.checked) {
+        document.getElementById('hq_' + number).disabled = false;
+        document.getElementById('text_auto_' + number).value = "on";
+    } else {
+        document.getElementById('hq_' + number).disabled = true;
+        document.getElementById('hq_' + number).checked = false;
+        document.getElementById('text_auto_' + number).value = "off";
+        document.getElementById('text_hq_' + number).value = "off";
+    }
+}
+
+function activate_text_hq(checkboxElem, number) {
+    if (checkboxElem.checked) {
+        document.getElementById('text_hq_' + number).value = "on";
+    } else {
+        document.getElementById('text_hq_' + number).value = "off";
+    }
 }
 
 $(document).ready(function () {

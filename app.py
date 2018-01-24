@@ -56,12 +56,13 @@ def home():
 @app.route('/settings', methods=['POST', 'GET'])
 def settings():
     if request.method == 'POST':
+        print(request.form)
         rss_feeds=[]
 
         for key, value in request.form.items():
             rss_feeds += [value]
 
-        rss_feeds_sliced = [rss_feeds[i:i+2] for i in range(0, len(rss_feeds), 2)]
+        rss_feeds_sliced = [rss_feeds[i:i+4] for i in range(0, len(rss_feeds), 4)]
 
         print(rss_feeds_sliced)
 
@@ -118,6 +119,12 @@ def play_video(guid=None):
 
 @app.route('/downloads')
 def downloads():
+    session = createSession()
+    subjects = session.query(Video).distinct(Video.subject_code).group_by(Video.subject_code)
+
+    clean_subjects = []
+    for subject in subjects:
+        clean_subjects.append(subject.subject_code)
     return render_template('downloads.html')
 
 
