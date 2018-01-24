@@ -95,6 +95,23 @@ socket.on('downloading_hq', function (data) {
     }
 });
 
+function add_settings_row() {
+    document.getElementById('rows').innerHTML += '<div class="row">\n' +
+        '                        <div class="input-field col s3">\n' +
+        '                            <input type="text" placeholder="Subject Code">\n' +
+        '                        </div>\n' +
+        '                        <div class="input-field col s8">\n' +
+        '                            <input type="text" placeholder="RSS URL">\n' +
+        '                        </div>\n' +
+        '                        <div class="delete col s1">\n' +
+        '                            <a class="waves-effect waves-light btn" >-</a>\n' +
+        '                        </div>\n' +
+        '                    </div>'
+}
+
+
+
 $(document).ready(function () {
     $(".button-collapse").sideNav();
+    $('.modal').modal();
 });

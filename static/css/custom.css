@@ -12,3 +12,23 @@
 .progress-words{
     margin:0;
 }
+
+body > div.container > div > a {
+    display: inline-block;
+    float: right;
+    margin-top: 28px;
+}
+
+#subject-code, #lecture-feeds {
+    display: inline-block;
+}
+
+#add-row {
+    display: inline-block;
+    float: right;
+    margin-top: 20px;
+}
+
+.delete {
+    margin-top: 15px;
+}

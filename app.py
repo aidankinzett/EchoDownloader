@@ -57,27 +57,15 @@ def home():
 @app.route('/settings', methods=['POST', 'GET'])
 def settings():
     if request.method == 'POST':
-        data = {
-            'rss_feeds': [request.form['rss_1'], request.form['rss_2'], request.form['rss_3']],
-            'download_directory': request.form['download_directory'],
-            'folder name within subject folder': request.form['video_folder_name']
-        }
+        print(request.form)
 
-        if 'sort' in request.form:
-            data['sort into subject folders'] = True
-        else:
-            data['sort into subject folders'] = False
+    feeds = []
+    for n in range(0,len(request.form)):
+        feeds.append()
 
-        if 'high_quality' in request.form:
-            data['high quality'] = True
-        else:
-            data['high quality'] = False
-        #
-        # with open('config.yml', 'w') as outfile:
-        #     yaml.dump(data, outfile, encoding='utf-8', allow_unicode=True)
 
-    with open("config.json", 'r') as ymlfile:
-        CONFIG = json.load(ymlfile)
+    # with open("config.json", 'r') as ymlfile:
+    #     CONFIG = json.load(ymlfile)
 
     RSS_FEEDS = CONFIG['rss_feeds']
     session = createSession()
@@ -87,7 +75,7 @@ def settings():
     for subject in subjects:
         clean_subjects.append(subject.subject_code)
 
-    return render_template('settings.html')
+    return render_template('settings.html', rss_feeds=RSS_FEEDS)
 
 
 @app.route('/subject/<subject_code>')

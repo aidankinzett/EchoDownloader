@@ -12,17 +12,27 @@
     <div class="container">
         <div class="col s12 m7">
             <h3>Settings</h3>
+            <h4 id="lecture-feeds">Lecture Feeds</h4>
+            <a class="btn-floating waves-effect waves-light btn" id="add-row" onclick="add_settings_row()">+</a>
             <form action="{{ url_for('settings') }}" method="POST">
-                <div class="input-field col s4">
-                    <input type="text" placeholder="Subject Code">
+                <div id="rows">
+                    {% for feed in rss_feeds %}
+                        {% set i = 1 %}
+                        <div class="row">
+                            <div class="input-field col s3">
+                                <input type="text" placeholder="Subject Code" value="{{ feed[0] }}" name="code_{{ i }}">
+                            </div>
+                            <div class="input-field col s8">
+                                <input type="text" placeholder="RSS URL" value="{{ feed[1] }}" name="rss_{{ i }}">
+                            </div>
+                            <div class="delete col s1">
+                                <a class="waves-effect waves-light btn">-</a>
+                            </div>
+                        </div>
+                        {% set i = i + 1 %}
+                    {% endfor %}
                 </div>
-                <div class="input-field col s8">
-                    <input type="text" placeholder="RSS URL">
-                </div>
-
-
-
-                <button class="btn waves-effect waves-light" type="submit" name="adsfadsf">Submit
+                <button class="btn waves-effect waves-light" type="submit">Submit
                     <i class="material-icons right">send</i>
                 </button>
             </form>
