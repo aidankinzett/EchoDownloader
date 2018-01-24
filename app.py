@@ -117,8 +117,9 @@ def play_video(guid=None):
     video = session.query(Video).filter(Video.guid == guid)[0]
 
     if video.downloaded == 1:
-
-        path = os.path.join(video.subject_code, "Lecture Videos", video.title + ".mp4")
+        path = "videos/" + video.subject_code + "/Lecture Videos/" + video.title + ".mp4"
+    elif video.downloaded == 2:
+        path = "videos/" + video.subject_code + "/Lecture Videos/" + video.title + ".mkv"
     else:
         path = video.url
 
@@ -341,7 +342,7 @@ def download_swf_video_file(time, url, guid):
                          os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time) + ".swf"))
 
 
-def download_all_swf_videos(max_time, url, guid):
+def download_all_swf_videos(max_time, url, guid, subject, title):
     """Download all the videos from time 0 to time max_time.
 
     The downloads are stored in the tempoary folder named using the GUID
@@ -357,7 +358,7 @@ def download_all_swf_videos(max_time, url, guid):
         download_swf_video_file(time, url, guid)
 
         percentage = (time / 8000 + 1) / (max_time / 8000 + 1) * 100
-        progress = {'guid': guid, 'downloading': percentage, 'converting': 0}
+        progress = {'guid': guid, 'downloading': percentage, 'converting': 0, 'subject':subject, 'title':title}
         socketio.emit('downloading_hq', progress)
         socketio.sleep(0.01)
 
@@ -502,7 +503,7 @@ def high_quality_download(url, video_path, subject, title):
     xmldoc = get_xml(newurl)
     max_time = get_max_time(xmldoc)
     guid = get_guid(xmldoc)
-    download_all_swf_videos(max_time, newurl, guid)
+    download_all_swf_videos(max_time, newurl, guid, subject, title)
     download_audio_file(newurl, guid)
     convert_videos(max_time, guid, subject, title)
     concat_videos(max_time, guid)
