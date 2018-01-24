@@ -39,6 +39,8 @@ thread_lock = Lock()
 
 
 downloading_guid = ""
+downloading_subject = ""
+downloading_title = ""
 
 @app.route('/')
 def home():
@@ -139,11 +141,11 @@ def downloads():
     return render_template('downloads.html', subjects=clean_subjects)
 
 def download_progress_bar(count, block_size, total_size):
-    global downloading_guid
+    global downloading_guid, downloading_subject, downloading_title
     """To provide a progress bar to show when downloading LQ videos."""
     percent = int(count * block_size * 100 / total_size)
     print(percent)
-    progress = {'guid': downloading_guid, 'downloading': percent}
+    progress = {'guid': downloading_guid, 'downloading': percent, 'subject': downloading_subject, 'title': downloading_title}
     socketio.emit('downloading', progress)
     socketio.sleep(0.001)
 
@@ -181,7 +183,7 @@ def emit_download(message):
 
 
 def download_video(message):
-    global downloading_guid
+    global downloading_guid, downloading_title, downloading_subject
     socketio.sleep(0.01)
 
     guid = message
@@ -196,6 +198,8 @@ def download_video(message):
     # log the video to be downloaded
     print("Downloading {} from subject {}".format(video_info[2], video_info[1]))
     downloading_guid = video_info[4]
+    downloading_subject = video_info[1]
+    downloading_title = video_info[2]
     # download video
     URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
     print("Finished downloading")
@@ -241,7 +245,7 @@ def download_high_quality(message):
 
     video_path = echodownloader.get_video_path(video_info, '.mkv')
     print("Downloading {} from subject {} in high quality".format(video_info[2], video_info[1]))
-    high_quality_download(video_info[0], video_path)
+    high_quality_download(video_info[0], video_path, video_info[1], video_info[2])
 
     echodownloader.mark_db_downloaded(video_info, 'hq')
 
@@ -373,7 +377,7 @@ def download_audio_file(url, guid):
     URLopener().retrieve(url + "/audio.mp3", os.path.join(DOWNLOAD_DIRECTORY, guid, "audio.mp3"))
 
 
-def convert_videos(max_time, guid):
+def convert_videos(max_time, guid, subject, title):
     """Convert all the swf files to mkv files.
 
     Converts swf videos from time 0 to time max_time contained within the GUID folder
@@ -392,7 +396,7 @@ def convert_videos(max_time, guid):
         os.remove(os.path.join(DOWNLOAD_DIRECTORY, guid, '{0:08d}'.format(time) + '.swf'))
 
         percentage = (time / 8000 + 1) / (max_time / 8000 + 1) * 100
-        progress = {'guid': guid, 'downloading': 100, 'converting': percentage}
+        progress = {'guid': guid, 'downloading': 100, 'converting': percentage, 'subject':subject, 'title':title}
         socketio.emit('downloading_hq', progress)
         socketio.sleep(0.01)
 
@@ -483,7 +487,7 @@ def combine_audio_and_video(guid, video_path):
     os.rmdir(os.path.join(DOWNLOAD_DIRECTORY, guid))
 
 
-def high_quality_download(url, video_path):
+def high_quality_download(url, video_path, subject, title):
     """Download a lecture from Echo360 in high quality.
 
     Given the url provided by the RSS feed for a lecture recording, this function
@@ -500,7 +504,7 @@ def high_quality_download(url, video_path):
     guid = get_guid(xmldoc)
     download_all_swf_videos(max_time, newurl, guid)
     download_audio_file(newurl, guid)
-    convert_videos(max_time, guid)
+    convert_videos(max_time, guid, subject, title)
     concat_videos(max_time, guid)
     trim_audio_file(guid)
     combine_audio_and_video(guid, video_path)
