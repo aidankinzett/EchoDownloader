@@ -38,6 +38,8 @@ thread = None
 thread_lock = Lock()
 
 
+downloading_guid = ""
+
 @app.route('/')
 def home():
     with open("config.json", 'r') as ymlfile:
@@ -137,10 +139,12 @@ def downloads():
     return render_template('downloads.html', subjects=clean_subjects)
 
 def download_progress_bar(count, block_size, total_size):
+    global downloading_guid
     """To provide a progress bar to show when downloading LQ videos."""
     percent = int(count * block_size * 100 / total_size)
     print(percent)
-    emit('downloading', percent)
+    progress = {'guid': downloading_guid, 'downloading': percent}
+    socketio.emit('downloading', progress)
     socketio.sleep(0.001)
 
 
@@ -177,6 +181,7 @@ def emit_download(message):
 
 
 def download_video(message):
+    global downloading_guid
     socketio.sleep(0.01)
 
     guid = message
@@ -190,7 +195,7 @@ def download_video(message):
     video_path = echodownloader.get_video_path(video_info, '.mp4')
     # log the video to be downloaded
     print("Downloading {} from subject {}".format(video_info[2], video_info[1]))
-
+    downloading_guid = video_info[4]
     # download video
     URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
     print("Finished downloading")

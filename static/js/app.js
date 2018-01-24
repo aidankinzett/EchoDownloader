@@ -63,12 +63,16 @@ function mark_video_as_unwatched(guid) {
 }
 
 socket.on('downloading', function (data) {
-    if (data < 100) {
-        document.getElementById(downloading_guid + "-determinate").style.width = data + '%';
-    } else if (data === 'done') {
-        document.getElementById(downloading_guid + "-progress").style.display = "none";
-        document.getElementById(downloading_guid + "-icon").innerText = "movie";
-        Materialize.toast('Finished downloading ' + downloading_guid, 4000);
+    document.getElementById(data.guid + "-progress").style.display = "inline";
+    downloading = true;
+
+    if (data.downloading < 100) {
+        document.getElementById(data.guid + "-words").innerText = "Downloading...";
+        document.getElementById(data.guid + "-determinate").style.width = data.downloading + '%';
+    } else if (data.downloading === 'done') {
+        document.getElementById(data.guid + "-progress").style.display = "none";
+        document.getElementById(data.guid + "-icon").innerText = "movie";
+        Materialize.toast('Finished downloading ' + data.guid, 4000);
         downloading = false;
     }
 });
