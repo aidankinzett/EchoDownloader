@@ -14,6 +14,8 @@ from xml.dom import minidom
 
 import echodownloader
 from createDB import *
+import feedparser
+import re
 
 monkey.patch_all()
 
@@ -24,7 +26,6 @@ RSS_FEEDS = CONFIG['rss_feeds']
 
 DOWNLOAD_DIRECTORY = os.path.join("static", "videos")
 DB_PATH = os.path.join(DOWNLOAD_DIRECTORY, 'echodownloader.db')
-VIDEO_FOLDER_NAME = "Lecture Videos"
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -51,7 +52,7 @@ def home():
     RSS_FEEDS = CONFIG['rss_feeds']
 
     for item in RSS_FEEDS:
-        echodownloader.get_video_info(item)
+        get_video_info(item)
 
     clean_subjects = []
     for item in RSS_FEEDS:
@@ -96,7 +97,7 @@ def display_subject(subject_code=None):
 
     for item in RSS_FEEDS:
         if item[0] == subject_code:
-            echodownloader.get_video_info(item)
+            get_video_info(item)
     session = createSession()
 
     videos = session.query(Video).filter(Video.subject_code == subject_code)
@@ -119,9 +120,9 @@ def play_video(guid=None):
     video = session.query(Video).filter(Video.guid == guid)[0]
 
     if video.downloaded == 1:
-        path = "videos/" + video.subject_code + "/Lecture Videos/" + video.title + ".mp4"
+        path = "videos/" + video.subject_code  + video.title + ".mp4"
     elif video.downloaded == 2:
-        path = "videos/" + video.subject_code + "/Lecture Videos/" + video.title + ".mkv"
+        path = "videos/" + video.subject_code + video.title + ".mkv"
     else:
         path = video.url
 
@@ -159,9 +160,9 @@ def open_video(guid):
     video = session.query(Video).filter(Video.guid == guid)[0]
 
     if video.downloaded == 1:
-        file_to_show = os.path.join(DOWNLOAD_DIRECTORY, video.subject_code, "Lecture Videos", video.title + ".mp4")
+        file_to_show = os.path.join(DOWNLOAD_DIRECTORY, video.subject_code, video.title + ".mp4")
     elif video.downloaded == 2:
-        file_to_show = os.path.join(DOWNLOAD_DIRECTORY, video.subject_code, "Lecture Videos", video.title + ".mkv")
+        file_to_show = os.path.join(DOWNLOAD_DIRECTORY, video.subject_code, video.title + ".mkv")
 
     subprocess.call(["open", "-R", file_to_show])
 
@@ -180,57 +181,55 @@ def handle_message(message):
 @socketio.on('download')
 def emit_download(message):
     global thread, downloading_bool, download_queue
-    download_queue.append(message)
-    if not downloading_bool:
-        with thread_lock:
-            if thread is None:
-                thread = socketio.start_background_task(target=download_video(message))
-        downloading_bool = True
+    download_queue.append([message, 0])
 
 
+def download_video():
+    global downloading_guid, downloading_title, downloading_subject, downloading_bool, download_queue
+    while True:
+        if len(download_queue) != 0:
+            for message in download_queue:
+                if message[1] == 0:
+                    print(message)
+                    download_queue.remove(message)
 
+                    guid = message[0]
 
-def download_video(message):
-    global downloading_guid, downloading_title, downloading_subject, downloading_bool
-    for message in download_queue:
-        print(message)
-        download_queue.remove(message)
+                    conn = sqlite3.connect(DB_PATH)
+                    cursor = conn.cursor()
+
+                    cursor.execute("SELECT * FROM videos WHERE guid = ?", [guid])
+                    video_info = cursor.fetchall()[0]
+
+                    conn.commit()
+                    conn.close()
+
+                    video_path = echodownloader.get_video_path(video_info, '.mp4')
+                    # log the video to be downloaded
+                    print("Downloading {} from subject {}".format(video_info[2], video_info[1]))
+                    downloading_guid = video_info[4]
+                    downloading_subject = video_info[1]
+                    downloading_title = video_info[2]
+                    # download video
+                    URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
+                    print("Finished downloading")
+                    socketio.emit('downloading', 'done')
+
+                    echodownloader.mark_db_downloaded(video_info, 'lq')
+                else:
+                    print(message)
+                    download_queue.remove(message)
+                    download_high_quality(message[0])
+            socketio.sleep(0.01)
         socketio.sleep(0.01)
 
-        guid = message
-
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT * FROM videos WHERE guid = ?", [guid])
-        video_info = cursor.fetchall()[0]
-
-        conn.commit()
-        conn.close()
-
-        video_path = echodownloader.get_video_path(video_info, '.mp4')
-        # log the video to be downloaded
-        print("Downloading {} from subject {}".format(video_info[2], video_info[1]))
-        downloading_guid = video_info[4]
-        downloading_subject = video_info[1]
-        downloading_title = video_info[2]
-        # download video
-        URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
-        print("Finished downloading")
-        socketio.emit('downloading', 'done')
-
-        echodownloader.mark_db_downloaded(video_info, 'lq')
-
-    downloading_bool = False
+thread = socketio.start_background_task(target=download_video)
 
 
 @socketio.on('download_hq')
 def emit_download_high_quality(message):
-    global thread, downloading_bool
-    with thread_lock:
-        if thread is None:
-            thread = socketio.start_background_task(target=download_high_quality(message))
-    downloading_bool = True
+    global thread, downloading_bool, download_queue
+    download_queue.append([message, 1])
 
 
 @socketio.on('mark_watched')
@@ -526,3 +525,69 @@ def high_quality_download(url, video_path, subject, title):
     concat_videos(max_time, guid)
     trim_audio_file(guid)
     combine_audio_and_video(guid, video_path)
+
+def get_video_info(rss_feed):
+    global download_queue
+    """Return info for all videos found in the given RSS feed.
+
+    Saves to database, if they are not already saved
+
+    Args:
+        rss_feed (str): The rss feed to check for videos
+
+    Returns:
+        list: List of found videos in format [[url,subject code, video title],...]
+
+    """
+    print("Checking RSS feeds...")
+    videos = []
+
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    parsed_feed = feedparser.parse(rss_feed[1])
+
+    # check that url is a valid lecture feed
+    if not parsed_feed.entries:
+        print("{} is not a valid lecture RSS feed".format(rss_feed[1]))
+
+    for entry in parsed_feed.entries:
+        # go through the info provided and find the video link
+        try:
+            enclose = entry.enclosures
+            for dictionary in enclose:
+                if 'type' in dictionary:
+                    if dictionary['type'] == 'video/mp4':
+                        url = dictionary['href']
+
+            # regex to find subject code
+            codefind = re.findall(r'Course ID:.*?<br', str(entry))
+            code = codefind[0][11:-3]
+
+            # get title from rss info
+            title = entry.title
+
+            guid = url[41:-14]
+
+            videos.append([url, code, title, guid])
+
+            cursor.execute("SELECT * FROM videos WHERE guid = ?", [guid])
+            video_info = cursor.fetchall()[0]
+
+            if video_info[3] == 0:
+                if rss_feed[2] == 'on':
+                    if rss_feed[3] == 'on':
+                        download_queue.append([guid, 1])
+                    else:
+                        download_queue.append([guid, 0])
+
+            cursor.execute("INSERT OR IGNORE INTO videos VALUES (?,?,?,0,?,0)", [url, code, title, guid])
+
+        except AttributeError:
+            print("Video entry found in RSS, but no link was provided")
+
+    conn.commit()
+    conn.close()
+
+    # returns list of all videos found in the rss feed
+    return videos

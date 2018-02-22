@@ -33,7 +33,6 @@ with open("config.json", 'r') as ymlfile:
 RSS_FEEDS = CONFIG['rss_feeds']
 DOWNLOAD_DIRECTORY = os.path.join('static','videos')
 DB_PATH = os.path.join(DOWNLOAD_DIRECTORY, 'echodownloader.db')
-VIDEO_FOLDER_NAME = "Lecture Videos"
 
 def check_database_exists():
     """If the database doesnt exists in the specified folder, create one."""
@@ -230,23 +229,13 @@ def get_video_path(video_info, extension):
         - str: The path for the video to be saved to
 
     """
-    video_path = os.path.join(DOWNLOAD_DIRECTORY, video_info[2] + extension)
 
 
     # if subject code directory does not exist, create it
     if not os.path.exists(os.path.join(DOWNLOAD_DIRECTORY, video_info[1])):
         os.makedirs(os.path.join(DOWNLOAD_DIRECTORY, video_info[1]))
 
-    # if to be placed within another folder
-    if VIDEO_FOLDER_NAME:
-        video_path = os.path.join(DOWNLOAD_DIRECTORY, video_info[1], VIDEO_FOLDER_NAME, video_info[2] + extension)
-
-        # if folder does not exist, create it
-        if not os.path.exists(os.path.join(DOWNLOAD_DIRECTORY, video_info[1], VIDEO_FOLDER_NAME)):
-            os.makedirs(os.path.join(DOWNLOAD_DIRECTORY, video_info[1], VIDEO_FOLDER_NAME))
-
-    else:
-        video_path = os.path.join(DOWNLOAD_DIRECTORY, video_info[1], video_info[2] + extension)
+    video_path = os.path.join(DOWNLOAD_DIRECTORY, video_info[1], video_info[2] + extension)
 
     return video_path
 

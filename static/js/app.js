@@ -26,7 +26,6 @@ function download_video(guid) {
 }
 
 function download_hq_video(guid) {
-    if (downloading === false) {
         console.log('downloading in hd');
         socket.emit('download_hq', guid);
         downloading_guid = guid;
@@ -34,9 +33,6 @@ function download_hq_video(guid) {
         document.getElementById(guid + "-progress").style.display = "inline";
         document.getElementById(guid + "-words").innerText = "Downloading...";
         Materialize.toast('Downloading ' + guid, 4000);
-    } else {
-        Materialize.toast('Something is already downloading, please wait until complete', 4000);
-    }
 }
 
 function open_video(guid) {
