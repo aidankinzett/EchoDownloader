@@ -16,6 +16,7 @@ import echodownloader
 from createDB import *
 import feedparser
 import re
+import webbrowser
 
 monkey.patch_all()
 
@@ -38,6 +39,10 @@ if __name__ == '__main__':
 thread = None
 thread_lock = Lock()
 
+url = 'http://localhost:5000'
+
+webbrowser.open(url)
+print('Go to '+url+' in your web broswer')
 
 downloading_guid = ""
 downloading_subject = ""
@@ -120,9 +125,9 @@ def play_video(guid=None):
     video = session.query(Video).filter(Video.guid == guid)[0]
 
     if video.downloaded == 1:
-        path = "videos/" + video.subject_code  + video.title + ".mp4"
+        path = "videos/" + video.subject_code + "/" + video.title + ".mp4"
     elif video.downloaded == 2:
-        path = "videos/" + video.subject_code + video.title + ".mkv"
+        path = "videos/" + video.subject_code + "/" + video.title + ".mkv"
     else:
         path = video.url
 
@@ -465,11 +470,11 @@ def trim_audio_file(guid):
     Args:
         - guid (str): The lecture's guid
     """
-    # ff_command = ffmpy.FFmpeg(
-    #     inputs={os.path.join(DOWNLOAD_DIRECTORY, guid, "audio.mp3"):None},
-    #     outputs={os.path.join(DOWNLOAD_DIRECTORY, guid, "trimmed_audio.mp3"):"-ss 00:00:15 -acodec copy"}
-    # )
-    # ff_command.run()
+    ff_command = ffmpy.FFmpeg(
+        inputs={os.path.join(DOWNLOAD_DIRECTORY, guid, "audio.mp3"):None},
+        outputs={os.path.join(DOWNLOAD_DIRECTORY, guid, "trimmed_audio.mp3"):"-ss 00:00:15 -acodec copy"}
+    )
+    ff_command.run()
 
     ff_command2 = ffmpy.FFmpeg(
         inputs={os.path.join(DOWNLOAD_DIRECTORY, guid, "trimmed_audio.mp3"): None},
@@ -571,6 +576,8 @@ def get_video_info(rss_feed):
 
             videos.append([url, code, title, guid])
 
+            cursor.execute("INSERT OR IGNORE INTO videos VALUES (?,?,?,0,?,0)", [url, code, title, guid])
+
             cursor.execute("SELECT * FROM videos WHERE guid = ?", [guid])
             video_info = cursor.fetchall()[0]
 
@@ -581,7 +588,7 @@ def get_video_info(rss_feed):
                     else:
                         download_queue.append([guid, 0])
 
-            cursor.execute("INSERT OR IGNORE INTO videos VALUES (?,?,?,0,?,0)", [url, code, title, guid])
+
 
         except AttributeError:
             print("Video entry found in RSS, but no link was provided")
