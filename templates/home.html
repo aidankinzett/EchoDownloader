@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block home %}
+class = "active"
+{% endblock %}
+
+{% block title %}
+Echo Downloader
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="col s12 m7">
+        <h2 class="header">Subjects</h2>
+        <div class="collection">
+        {% for subject in subjects %}
+             <a href="{{ url_for('display_subject', subject_code=subject) }}" class="collection-item">{{ subject }}</a>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

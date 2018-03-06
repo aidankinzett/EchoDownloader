@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Echo Downloader | {{ video.title }}
+{% endblock %}
+
+{% block content %}
+<style>
+	* { box-sizing: border-box; }
+	body { margin: 0; font-family: sans-serif; }
+
+	video {
+		z-index: 1;
+		display: block;
+		margin: 0 auto;
+		background-color: #ccc;
+
+		/* maximize video player size within viewport while maintaining 16:9 format */
+		width: 100vw;
+		height: 56.25vw;
+		max-width: 177.78vh;
+		max-height: 100vh;
+	}
+
+	@keyframes fadeOut {
+		0%   { opacity: 1; }
+		95%  { opacity: 1; }
+		100% { opacity: 0; }
+	}
+	.fadeout { animation: fadeOut 1s linear; }
+
+	#playback-speed {
+
+	}
+</style>
+
+{% if video.downloaded != 0 %}
+<video src="{{ url_for('static', filename=path) }}" controls autoplay></video>
+{% else %}
+<video src="{{ path }}" controls autoplay></video>
+{% endif %}
+<input class='fadeout' type="text" placeholder="playback speed" value="2" id="playback-speed">
+
+<script>
+	// get DOM elements
+	const video = document.querySelector('video');
+	const speedInput = document.querySelector('input[type=text]');
+
+
+	// handle changes to speed input
+	speedInput.addEventListener('change', e => {
+		video.playbackRate = Number(speedInput.value);
+		// write actual playback rate value back to input
+		speedInput.value = Number(video.playbackRate);
+	});
+
+	// add keyboard shortcuts for pause (space) and 5 sec jump (left/right arrow)
+	document.addEventListener('keydown', e => {
+		// console.log(e.keyCode);
+		switch (e.keyCode) {
+			case 32: // space
+				video.paused ? video.play() : video.pause();
+				break;
+			case 37: // left arrow
+				video.currentTime += -5;
+				break;
+			case 39: // right arrow
+				video.currentTime += 5;
+				break;
+		}
+	});
+</script>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Echo Downloader | Downloads
+{% endblock %}
+
+{% block downloads %}
+class="active"
+{% endblock %}
+
+{% block content %}
+<div id="downloads-page" class="container">
+    <h3>Downloads</h3>
+    <div class="row">
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title" id="card1-title">Not Currently Downloading Anything</span>
+                    <p id="card1-words"></p>
+                    <div class="progress">
+                        <div class="determinate" id="card1-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="#">Cancel</a>
+                </div>
+            </div>
+        </div>
+        <div class="col s12">
+            <div class="card">
+                <div class="card-content">
+                    <span class="card-title" id="card1-title">Video Number 2</span>
+                    <p id="card1-words"></p>
+                </div>
+                <div class="card-action">
+                    <a href="#">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/downloads.js') }}"></script>
+{% endblock %}}

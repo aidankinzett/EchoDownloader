@@ -10,6 +10,7 @@ Functions to:
 Uses configuration from "config.yml"
 """
 import os
+import json
 import re
 import sqlite3
 import sys
@@ -17,28 +18,26 @@ from urllib.request import URLopener
 import yaml
 import feedparser
 import flashdownloader
-
-
-# CHANGES!
+from createDB import *
+from createDB import Video
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.dialects.sqlite import *
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql.expression import *
 
 # open the configuration file and save config as constants
-with open("config.yml", 'r') as ymlfile:
-    CONFIG = yaml.load(ymlfile)
+with open("config.json", 'r') as ymlfile:
+    CONFIG = json.load(ymlfile)
 
-RSS_FEEDS = CONFIG['rss feeds']
-DOWNLOAD_DIRECTORY = CONFIG['download directory']
+RSS_FEEDS = CONFIG['rss_feeds']
+DOWNLOAD_DIRECTORY = os.path.join('static','videos')
 DB_PATH = os.path.join(DOWNLOAD_DIRECTORY, 'echodownloader.db')
-HIGH_QUALITY = CONFIG['high quality']
-SORT = CONFIG['sort into subject folders']
-VIDEO_FOLDER_NAME = CONFIG['folder name within subject folder']
 
 def check_database_exists():
     """If the database doesnt exists in the specified folder, create one."""
     if not os.path.exists(DB_PATH):
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute('CREATE TABLE "urls" (`URL` TEXT, `Subject Code` TEXT,'+
-                       '`Title` TEXT , `Downloaded` INTEGER, UNIQUE(`URL`))')
+        createDatabase()
 
 def get_video_info(rss_feed):
     """Return info for all videos found in the given RSS feed.
@@ -58,30 +57,36 @@ def get_video_info(rss_feed):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    parsed_feed = feedparser.parse(rss_feed)
+    parsed_feed = feedparser.parse(rss_feed[1])
 
     # check that url is a valid lecture feed
     if not parsed_feed.entries:
-        print("{} is not a valid lecture RSS feed".format(rss_feed))
+        print("{} is not a valid lecture RSS feed".format(rss_feed[1]))
 
     for entry in parsed_feed.entries:
-        # regex to find subject code
-        codefind = re.findall(r'Course ID:.*?<br', str(entry))
-        code = codefind[0][11:-3]
-
-        # get title from rss info
-        title = entry.title
-
         # go through the info provided and find the video link
-        enclose = entry.enclosures
-        for dictionary in enclose:
-            if 'type' in dictionary:
-                if dictionary['type'] == 'video/mp4':
-                    url = dictionary['href']
+        try:
+            enclose = entry.enclosures
+            for dictionary in enclose:
+                if 'type' in dictionary:
+                    if dictionary['type'] == 'video/mp4':
+                        url = dictionary['href']
 
-        videos.append([url, code, title])
+            # regex to find subject code
+            codefind = re.findall(r'Course ID:.*?<br', str(entry))
+            code = codefind[0][11:-3]
 
-        cursor.execute("INSERT OR IGNORE INTO urls VALUES (?,?,?,0)", [url, code, title])
+            # get title from rss info
+            title = entry.title
+
+            guid = url[41:-14]
+
+            videos.append([url, code, title, guid])
+
+            cursor.execute("INSERT OR IGNORE INTO videos VALUES (?,?,?,0,?,0)", [url, code, title, guid])
+
+        except AttributeError:
+            print("Video entry found in RSS, but no link was provided")
 
     conn.commit()
     conn.close()
@@ -113,7 +118,7 @@ def check_database(videos):
     # check to see if the videos have been downloaded
     for item in videos:
         dblist = []
-        for row in cursor.execute("SELECT * FROM urls WHERE URL = ? AND Downloaded = 0", [item[0]]):
+        for row in cursor.execute("SELECT * FROM videos WHERE URL = ? AND Downloaded = 0", [item[0]]):
             dblist.append(row)
 
         if len(dblist) == 1:
@@ -126,6 +131,7 @@ def check_database(videos):
     # return list of videos with either no database entry, or that have not been downloaded
     return new_videos
 
+
 def download_progress_bar(count, block_size, total_size):
     """To provide a progress bar to show when downloading LQ videos."""
     percent = int(count*block_size*100/total_size)
@@ -134,6 +140,18 @@ def download_progress_bar(count, block_size, total_size):
     sys.stdout.write("\r" + "[" + numhash*"#" + numdash*"-" + "] {0}%".format(percent))
 
     sys.stdout.flush()
+
+
+def download_from_guid(guid):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM videos WHERE guid = ?", [guid])
+    video_info = cursor.fetchall()[0]
+
+    download_video_file(video_info, get_video_path(video_info, '.mp4'))
+    mark_db_downloaded(video_info, 'lq')
+    return 'no'
 
 def download_video_file(video_info, video_path):
     """Download video file.
@@ -150,7 +168,8 @@ def download_video_file(video_info, video_path):
     URLopener().retrieve(video_info[0], video_path, reporthook=download_progress_bar)
     print("Finished downloading")
 
-def mark_db_downloaded(video_info):
+
+def mark_db_downloaded(video_info, quality):
     """Update video in database after downloading.
 
     Uses database specified in configuration file.
@@ -162,11 +181,15 @@ def mark_db_downloaded(video_info):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    cursor.execute("UPDATE urls SET `Downloaded` = 1 WHERE `URL` = ?", [video_info[0]])
+    if quality == "lq":
+        cursor.execute("UPDATE videos SET `Downloaded` = 1 WHERE `URL` = ?", [video_info[0]])
+    else:
+        cursor.execute("UPDATE videos SET `Downloaded` = 2 WHERE `URL` = ?", [video_info[0]])
 
     # close connection to database
     conn.commit()
     conn.close()
+
 
 def download_all_videos(videos):
     """Download all the videos provided using the download_video_file function.
@@ -183,12 +206,13 @@ def download_all_videos(videos):
             except:
                 video_path = get_video_path(video_info, '.mp4')
                 download_video_file(video_info, video_path)
-            mark_db_downloaded(video_info)
+            mark_db_downloaded(video_info, 'hq')
     else:
         for video_info in videos:
             video_path = get_video_path(video_info, '.mp4')
             download_video_file(video_info, video_path)
-            mark_db_downloaded(video_info)
+            mark_db_downloaded(video_info, 'lq')
+
 
 def get_video_path(video_info, extension):
     """Work out the path that the video needs to be saved to.
@@ -205,30 +229,20 @@ def get_video_path(video_info, extension):
         - str: The path for the video to be saved to
 
     """
-    video_path = os.path.join(DOWNLOAD_DIRECTORY, video_info[2] + extension)
 
-    # if video files are to be sorted into folders
-    if SORT:
 
-        # if subject code directory does not exist, create it
-        if not os.path.exists(os.path.join(DOWNLOAD_DIRECTORY, video_info[1])):
-            os.makedirs(os.path.join(DOWNLOAD_DIRECTORY, video_info[1]))
 
-        # if to be placed within another folder
-        if VIDEO_FOLDER_NAME:
-            video_path = os.path.join(DOWNLOAD_DIRECTORY, video_info[1], VIDEO_FOLDER_NAME, video_info[2] + extension)
+    # if subject code directory does not exist, create it
+    if not os.path.exists(os.path.join(DOWNLOAD_DIRECTORY, video_info[1])):
+        os.makedirs(os.path.join(DOWNLOAD_DIRECTORY, video_info[1]))
 
-            # if folder does not exist, create it
-            if not os.path.exists(os.path.join(DOWNLOAD_DIRECTORY, video_info[1], VIDEO_FOLDER_NAME)):
-                os.makedirs(os.path.join(DOWNLOAD_DIRECTORY, video_info[1], VIDEO_FOLDER_NAME))
-
-        else:
-            video_path = os.path.join(DOWNLOAD_DIRECTORY, video_info[1], video_info[2] + extension)
+    video_path = os.path.join(DOWNLOAD_DIRECTORY, video_info[1], video_info[2] + extension)
 
     return video_path
 
+
 check_database_exists()
-for feed in RSS_FEEDS:
-    videos = get_video_info(feed)
-    new_videos = check_database(videos)
-    download_all_videos(new_videos)
+# for feed in RSS_FEEDS:
+#     videos = get_video_info(feed)
+#     new_videos = check_database(videos)
+#     download_all_videos(new_videos)
