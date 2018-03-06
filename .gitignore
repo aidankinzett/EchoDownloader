@@ -9,5 +9,5 @@ virtualenv
 
 \.idea/
 venv
-static/videos
+static/videos/*
 run.bat
