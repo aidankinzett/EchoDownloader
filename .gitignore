@@ -10,4 +10,5 @@ virtualenv
 \.idea/
 venv
 static/videos/*
+!static/videos/.gitkeep
 run.bat
