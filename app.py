@@ -593,7 +593,7 @@ def get_video_info(rss_feed):
             cursor.execute("SELECT * FROM videos WHERE guid = ?", [guid])
             video_info = cursor.fetchall()[0]
 
-            if video_info[3] == 0:
+            if video_info[5] == 0:
                 if rss_feed[2] == 'on':
                     if rss_feed[3] == 'on':
                         download_queue.append([guid, 1])
