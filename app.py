@@ -41,8 +41,7 @@ thread_lock = Lock()
 
 url = 'http://localhost:5000'
 
-webbrowser.open(url)
-print('Go to '+url+' in your web broswer')
+print('Go to '+url+' in your web browser')
 
 downloading_guid = ""
 downloading_subject = ""
@@ -187,6 +186,19 @@ def handle_message(message):
 def emit_download(message):
     global thread, downloading_bool, download_queue
     download_queue.append([message, 0])
+
+@socketio.on('delete')
+def delete_video(guid):
+    session = createSession()
+    video = session.query(Video).filter(Video.guid == guid)[0]
+
+    if video.downloaded == 1:
+        os.remove(os.path.join(DOWNLOAD_DIRECTORY, video.subject_code, video.title + ".mp4"))
+    elif video.downloaded == 2:
+        os.remove(os.path.join(DOWNLOAD_DIRECTORY, video.subject_code, video.title + ".mkv"))
+
+    video.downloaded = 0
+    session.commit()
 
 
 def download_video():

@@ -55,6 +55,11 @@ function mark_video_as_unwatched(guid) {
 
 }
 
+function delete_video(guid) {
+    socket.emit('delete', guid);
+    // TODO: other things
+}
+
 socket.on('downloading', function (data) {
     document.getElementById(data.guid + "-progress").style.display = "inline";
     downloading = true;

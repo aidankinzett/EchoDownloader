@@ -43,7 +43,9 @@
                                         <div class="col s3">
                                             <a href="#!" onclick="open_video('{{ item.guid }}')">Open in Finder</a>
                                         </div>
-                                        <div class="col s3"></div>
+                                        <div class="col s3">
+                                            <a href="#!" onclick="delete_video('{{item.guid}}')">Delete Video</a>
+                                        </div>
                                         {% if item.watched %}
                                             <div class="col s3" id="{{ item.guid }}-unwatched">
                                                 <a href="#!" onclick="mark_video_as_unwatched('{{ item.guid }}')">Mark
