@@ -18,6 +18,7 @@ import feedparser
 import re
 import webbrowser
 import time
+import threading
 
 monkey.patch_all()
 
@@ -593,6 +594,6 @@ def check_rss_feeds():
         for item in RSS_FEEDS:
             clean_subjects.append(item[0])
 
-        time.sleep(300)
+        socketio.sleep(300)
 
 thread = socketio.start_background_task(target=check_rss_feeds)
