@@ -17,6 +17,7 @@ from createDB import *
 import feedparser
 import re
 import webbrowser
+import time
 
 monkey.patch_all()
 
@@ -49,19 +50,10 @@ downloading_title = ""
 downloading_bool = False
 download_queue = []
 
+clean_subjects = ""
+
 @app.route('/')
 def home():
-    with open("config.json", 'r') as ymlfile:
-        CONFIG = json.load(ymlfile)
-    RSS_FEEDS = CONFIG['rss_feeds']
-
-    for item in RSS_FEEDS:
-        get_video_info(item)
-
-    clean_subjects = []
-    for item in RSS_FEEDS:
-        clean_subjects.append(item[0])
-
     return render_template('home.html', subjects=clean_subjects)
 
 
@@ -95,31 +87,15 @@ def settings():
 
 @app.route('/subject/<subject_code>')
 def display_subject(subject_code=None):
-    with open("config.json", 'r') as ymlfile:
-        CONFIG = json.load(ymlfile)
-    RSS_FEEDS = CONFIG['rss_feeds']
-
-    for item in RSS_FEEDS:
-        if item[0] == subject_code:
-            get_video_info(item)
     session = createSession()
 
     videos = session.query(Video).filter(Video.subject_code == subject_code)
-
-
-    clean_subjects = []
-    for item in RSS_FEEDS:
-        clean_subjects.append(item[0])
 
     return render_template('subject.html', videos=videos, subject_code=subject_code, subjects=clean_subjects)
 
 
 @app.route('/video?=<guid>')
 def play_video(guid=None):
-    with open("config.json", 'r') as ymlfile:
-        CONFIG = json.load(ymlfile)
-    RSS_FEEDS = CONFIG['rss_feeds']
-
     session = createSession()
     video = session.query(Video).filter(Video.guid == guid)[0]
 
@@ -131,21 +107,10 @@ def play_video(guid=None):
         path = video.url
 
     print(path)
-
-    clean_subjects = []
-    for item in RSS_FEEDS:
-        clean_subjects.append(item[0])
     return render_template('video_player.html', video=video, path=path, subjects=clean_subjects)
 
 @app.route('/downloads')
 def downloads():
-    with open("config.json", 'r') as ymlfile:
-        CONFIG = json.load(ymlfile)
-    RSS_FEEDS = CONFIG['rss_feeds']
-
-    clean_subjects = []
-    for item in RSS_FEEDS:
-        clean_subjects.append(item[0])
     return render_template('downloads.html', subjects=clean_subjects)
 
 def download_progress_bar(count, block_size, total_size):
@@ -241,6 +206,8 @@ def download_video():
         socketio.sleep(0.01)
 
 thread = socketio.start_background_task(target=download_video)
+
+
 
 
 @socketio.on('download_hq')
@@ -610,3 +577,22 @@ def get_video_info(rss_feed):
 
     # returns list of all videos found in the rss feed
     return videos
+
+def check_rss_feeds():
+    global clean_subjects
+
+    while True:
+        with open("config.json", 'r') as ymlfile:
+            CONFIG = json.load(ymlfile)
+        RSS_FEEDS = CONFIG['rss_feeds']
+
+        for item in RSS_FEEDS:
+            get_video_info(item)
+
+        clean_subjects = []
+        for item in RSS_FEEDS:
+            clean_subjects.append(item[0])
+
+        time.sleep(300)
+
+thread = socketio.start_background_task(target=check_rss_feeds)
