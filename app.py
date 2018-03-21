@@ -596,4 +596,5 @@ def check_rss_feeds():
 
         socketio.sleep(300)
 
+
 thread = socketio.start_background_task(target=check_rss_feeds)
